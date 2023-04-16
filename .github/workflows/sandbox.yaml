@@ -72,8 +72,7 @@ jobs:
         shell: bash
         name: Dependencies
 
-      - run: |
-          npm run migration:run
+      - run: npm run migration:run
         shell: bash
         name: Migrations
         env:
