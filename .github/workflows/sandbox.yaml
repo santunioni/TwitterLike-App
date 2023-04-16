@@ -84,7 +84,26 @@ jobs:
           name: build
 
       - id: terraform
-        run: make aws/terraform
+        run: |
+          make aws/terraform
+          cd terraform
+          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+
+      - run: npm run test:acceptance
+        shell: bash
+        name: Acceptance TRPC Tests
+        env:
+          DRIVER: trpc
+          API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
+          TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
+
+      - run: npm run test:acceptance
+        shell: bash
+        name: Acceptance REST Tests
+        env:
+          DRIVER: rest
+          API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
+          TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
