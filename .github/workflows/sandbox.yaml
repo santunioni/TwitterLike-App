@@ -70,6 +70,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.4
+          terraform_wrapper: false
 
       - run: npm install
         shell: bash
@@ -90,7 +91,7 @@ jobs:
         run: |
           make aws/terraform
           cd terraform
-          terraform output API_GATEWAY_URL
+          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
