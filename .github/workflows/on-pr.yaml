@@ -12,4 +12,3 @@ jobs:
   sandbox:
     uses: ./.github/workflows/sandbox.yaml
     if: github.event.pull_request.draft == false
-    needs: ci

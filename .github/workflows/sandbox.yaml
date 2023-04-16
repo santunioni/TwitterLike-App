@@ -2,6 +2,9 @@ name: Deploy Sandbox
 
 env:
   pscale_base_directory: .pscale
+  DB_NAME: realworld-app
+  GITHUB_USER: ${{ github.actor }}
+  ORG_NAME: santunioni
 
 on:
   workflow_call:
@@ -9,6 +12,10 @@ on:
 permissions:
   id-token: write
   contents: read
+
+concurrency:
+  group: sandbox
+  cancel-in-progress: false
 
 jobs:
   sandbox:
@@ -30,25 +37,18 @@ jobs:
         id: database
         timeout-minutes: 3
         env:
-          ORG_NAME: santunioni
-          DB_NAME: realworld-app
-          GITHUB_USER: ${{ github.actor }}
           BRANCH_NAME: ${{ steps.environment.outputs.name }}
         working-directory: ${{ env.pscale_base_directory }}/cli-helper-scripts/
         run: |
           . use-pscale-docker-image.sh
-          . wait-for-branch-readiness.sh
-          . authenticate-ps.sh
-          . set-db-and-org-and-branch-name.sh
-          . ps-create-helper-functions.sh
-          . create-branch-connection-string.sh
 
-          create-db-branch "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" "recreate"
-          wait_for_branch_readiness 10 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 30
-          create-deploy-request "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME"
-          create-branch-connection-string "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" "creds-${BRANCH_NAME}"
+          pscale branch delete "$DB_NAME" "$BRANCH_NAME" --force
+          pscale branch create "$DB_NAME" "$BRANCH_NAME" --wait
 
-          echo "DATABASE_URL=$MY_DB_URL" >> $GITHUB_OUTPUT
+          raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$CREDS" --org "$ORG_NAME" --format json)
+          DATABASE_URL=`echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\""`
+
+          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v3
         with:
@@ -71,10 +71,10 @@ jobs:
         env:
           DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
 
-      - name: Downloading Build
-        uses: actions/download-artifact@v3
-        with:
-          name: build
+      - name: Zipping Build
+        shell: bash
+        run: |
+          make build zip setup
 
       - id: terraform
         run: make aws/terraform
