@@ -78,10 +78,10 @@ jobs:
         env:
           DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
 
-      - name: Zipping Build
-        shell: bash
-        run: |
-          make build zip setup
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
 
       - id: terraform
         run: make aws/terraform
