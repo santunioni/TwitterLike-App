@@ -67,6 +67,7 @@ localstack/terraform:
 aws/terraform:
 	cd terraform \
 	&& terraform init -upgrade -reconfigure -backend-config="key=realworld-app/$(TF_VAR_ENVIRONMENT)/lambda.tfstate" \
+	&& terraform refresh \
 	&& terraform apply -auto-approve
 
 planetscale/migrations:
