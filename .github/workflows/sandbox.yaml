@@ -14,6 +14,8 @@ jobs:
   sandbox:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - id: environment
         env:
           BRANCH_NAME: ${{ github.event.inputs.branch_name }}
@@ -30,13 +32,22 @@ jobs:
           ORG_NAME: santunioni
           DB_NAME: realworld-app
           GITHUB_USER: ${{ github.actor }}
+          BRANCH_NAME: ${{ steps.environment.outputs.name }}
         working-directory: ${{ env.pscale_base_directory }}/cli-helper-scripts/
         run: |
-          ./create-db-branch.sh "${{ steps.environment.outputs.name }}"
-          ./create-branch-connection-string.sh "${{ steps.environment.outputs.name }}"
-          echo "DATABASE_URL=$MY_DB_URL" >> $GITHUB_OUTPUT
+          . use-pscale-docker-image.sh
+          . wait-for-branch-readiness.sh
+          . authenticate-ps.sh
+          . set-db-and-org-and-branch-name.sh
+          . ps-create-helper-functions.sh
+          . create-branch-connection-string.sh
 
-      - uses: actions/checkout@v3
+          create-db-branch "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" "recreate"
+          wait_for_branch_readiness 10 "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" 30
+          create-deploy-request "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME"
+          create-branch-connection-string "$DB_NAME" "$BRANCH_NAME" "$ORG_NAME" "creds-${BRANCH_NAME}"
+
+          echo "DATABASE_URL=$MY_DB_URL" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v3
         with:
