@@ -87,7 +87,7 @@ jobs:
         run: |
           make aws/terraform
           cd terraform
-          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL)" >> $GITHUB_OUTPUT
+          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
