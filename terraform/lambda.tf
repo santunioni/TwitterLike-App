@@ -1,5 +1,5 @@
 resource "aws_iam_role" "realworld_api_function_role" {
-  name               = local.name
+  name               = local.NAME
   assume_role_policy = <<EOF
     {
       "Version": "2012-10-17",
@@ -23,14 +23,14 @@ EOF
 }
 
 resource "aws_lambda_function" "realworld_api_function" {
-  function_name = local.name
+  function_name = local.NAME
   role          = aws_iam_role.realworld_api_function_role.arn
   tags          = local.COMMON_TAGS
   provider      = aws
   environment {
     variables = {
       DATABASE_URL = var.DATABASE_URL
-      BASE_URL     = aws_api_gateway_deployment.stage_v1.invoke_url
+      BASE_URL     = local.BASE_URL
       API_PREFIX   = ""
       VERSION      = data.external.git.result.sha
     }
