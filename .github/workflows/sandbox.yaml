@@ -52,13 +52,13 @@ jobs:
           fi
 
           PASSWORD_NAME=sandbox
-          PASSWORD_EXISTS=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$PASSWORD_NAME\") | .name")
-          if [ "$PASSWORD_EXISTS" == "$PASSWORD_NAME" ]; then
+          PASSWORD_ID=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$PASSWORD_NAME\") | .id")
+          if [ -n "$PASSWORD_ID" ]; then
               echo "Deleting password $PASSWORD_NAME."
-              pscale password delete "$DB_NAME" "$BRANCH_NAME" $PASSWORD_NAME --org "$ORG_NAME" --force
+              pscale password delete "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_ID" --org "$ORG_NAME" --force
           fi
           raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_NAME" --org "$ORG_NAME" --format json)
-          DATABASE_URL=`echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\""`
+          DATABASE_URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\"")
 
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
 
