@@ -18,7 +18,7 @@ jobs:
 
       - id: environment
         env:
-          BRANCH_NAME: ${{ github.event.inputs.branch_name }}
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
           NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
           echo "name=$NAME" >> $GITHUB_OUTPUT
