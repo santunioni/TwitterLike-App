@@ -43,7 +43,7 @@ jobs:
           . use-pscale-docker-image.sh
 
           BRANCHES=$(pscale branch list "$DB_NAME" --org "$ORG_NAME" --format json)
-          BRANCH_EXISTS=echo $BRANCHES | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .name")
+          BRANCH_EXISTS=echo $BRANCHES | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .name"
           echo $BRANCHES $BRANCH_NAME $BRANCH_EXISTS
           if [ "$BRANCH_EXISTS" == "$BRANCH_NAME" ]; then
             echo "Branch $BRANCH_NAME already exists"
