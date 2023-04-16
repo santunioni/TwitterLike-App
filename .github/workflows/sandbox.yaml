@@ -42,8 +42,8 @@ jobs:
         run: |
           . use-pscale-docker-image.sh
 
-          pscale branch delete "$DB_NAME" "$BRANCH_NAME" --org "ORG_NAME" --force
-          pscale branch create "$DB_NAME" "$BRANCH_NAME" --org "ORG_NAME" --wait
+          pscale branch delete "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --force
+          pscale branch create "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --wait
 
           raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$CREDS" --org "$ORG_NAME" --format json)
           DATABASE_URL=`echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\""`
