@@ -52,7 +52,7 @@ jobs:
             pscale branch create $DB_NAME $BRANCH_NAME --org "$ORG_NAME" --wait
           fi
 
-          raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" MySandBoxPassword --org "$ORG_NAME" --format json)
+          raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" my-sandbox-password --org "$ORG_NAME" --format json)
           DATABASE_URL=`echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\""`
 
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
