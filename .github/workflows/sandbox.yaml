@@ -20,6 +20,9 @@ concurrency:
 jobs:
   sandbox:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v3
 
@@ -87,7 +90,7 @@ jobs:
         run: |
           make aws/terraform
           cd terraform
-          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
+          terraform output API_GATEWAY_URL
         env:
           TF_VAR_DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
