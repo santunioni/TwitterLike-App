@@ -29,6 +29,7 @@ function injectSwagger(nest: INestApplication) {
 
 export async function createNestApplication() {
   const nest = await NestFactory.create(AppModule)
+  injectSwagger(nest)
   await nest.init()
   return nest
 }
@@ -37,7 +38,6 @@ export async function createExpressApp() {
   const app = express()
 
   const nest = await createNestApplication()
-  injectSwagger(nest)
 
   app.use('/api', nest.getHttpAdapter().getInstance())
 
