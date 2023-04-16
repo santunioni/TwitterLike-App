@@ -1,0 +1,90 @@
+name: Deploy Sandbox
+
+env:
+  pscale_base_directory: .pscale
+  DB_NAME: realworld-app
+  GITHUB_USER: ${{ github.actor }}
+  ORG_NAME: santunioni
+
+on:
+  workflow_call:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: sandbox
+  cancel-in-progress: false
+
+jobs:
+  sandbox:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: environment
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+          NAME=sandbox
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+
+      - uses: ./.github/actions/credentials
+
+      - name: Create DB branch and deploy request- if asked, please click on displayed link to authenticate
+        id: database
+        timeout-minutes: 3
+        env:
+          BRANCH_NAME: ${{ steps.environment.outputs.name }}
+        working-directory: ${{ env.pscale_base_directory }}/cli-helper-scripts/
+        run: |
+          . use-pscale-docker-image.sh
+
+          pscale auth login
+
+          BRANCH_EXISTS=$(pscale branch list "$DB_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .name")
+          if [ "$BRANCH_EXISTS" != "$BRANCH_NAME" ]; then
+            pscale branch create $DB_NAME $BRANCH_NAME --org "$ORG_NAME" --wait
+          fi
+
+          PASSWORD_NAME=sandbox
+          PASSWORD_ID=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$PASSWORD_NAME\") | .id")
+          if [ -n "$PASSWORD_ID" ]; then
+              pscale password delete "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_ID" --org "$ORG_NAME" --force
+          fi
+          raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_NAME" --org "$ORG_NAME" --format json)
+          DATABASE_URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/$DB_NAME\"")
+
+          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.4
+
+      - run: npm install
+        shell: bash
+        name: Dependencies
+
+      - run: npm run migration:run
+        shell: bash
+        name: Migrations
+        env:
+          DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
+
+      - name: Zipping Build
+        shell: bash
+        run: |
+          make build zip setup
+
+      - id: terraform
+        run: make aws/terraform
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.database.outputs.DATABASE_URL }}
+          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}

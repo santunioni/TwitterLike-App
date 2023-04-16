@@ -8,6 +8,13 @@ variable "DATABASE_URL" {
   type        = string
 }
 
+
+variable "STAGE_NAME" {
+  description = "The stage name"
+  type        = string
+  default     = "v1"
+}
+
 data "external" "git" {
   program = [
     "git",
@@ -18,10 +25,13 @@ data "external" "git" {
   ]
 }
 
+data "aws_region" "current" {}
+
 locals {
   COMMON_TAGS = {
     Environment = var.ENVIRONMENT
     RepoLink    = "https://github.com/santunioni/realworld-app"
   }
-  name = "realworld-api-${var.ENVIRONMENT}"
+  NAME     = "realworld-api-${var.ENVIRONMENT}"
+  BASE_URL = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${var.STAGE_NAME}"
 }

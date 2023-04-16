@@ -1,3 +1,4 @@
+import { INestApplication } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule } from '@nestjs/swagger'
 import * as trpcExpress from '@trpc/server/adapters/express'
@@ -11,19 +12,23 @@ import { createPreConfiguredOpenAPIDocumentBuilder } from './nest/openapi'
 import { createContext } from './trpc/app'
 import { createMergedTRPCApp } from './trpc/merged'
 
-export async function createNestApplication(baseApiUrl: string) {
-  const nest = await NestFactory.create(AppModule)
+function injectSwagger(nest: INestApplication) {
+  const { BASE_URL } = getEnvs()
   SwaggerModule.setup(
     'docs',
     nest,
     SwaggerModule.createDocument(
       nest,
-      createPreConfiguredOpenAPIDocumentBuilder().addServer(baseApiUrl).build(),
+      createPreConfiguredOpenAPIDocumentBuilder().addServer(BASE_URL).build(),
     ),
     {
       useGlobalPrefix: true,
     },
   )
+}
+
+export async function createNestApplication() {
+  const nest = await NestFactory.create(AppModule)
   await nest.init()
   return nest
 }
@@ -31,8 +36,9 @@ export async function createNestApplication(baseApiUrl: string) {
 export async function createExpressApp() {
   const app = express()
 
-  const { BASE_URL } = getEnvs()
-  const nest = await createNestApplication(`${BASE_URL}/api`)
+  const nest = await createNestApplication()
+  injectSwagger(nest)
+
   app.use('/api', nest.getHttpAdapter().getInstance())
 
   app.use(
