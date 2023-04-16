@@ -25,14 +25,17 @@ nohup/docker:
 infra/up:
 	docker-compose up localstack mysql
 
+format:
+	npx prettier --write .
+	cd terraform && terraform fmt
+
 ci:
 	docker-compose rm -f localstack mysql
 	docker-compose up -d localstack mysql
 
 	npm install
 
-	npx prettier --write .
-	cd terraform && terraform fmt
+	make format
 	npx tsc --noEmit
 
 	npm run migration:run

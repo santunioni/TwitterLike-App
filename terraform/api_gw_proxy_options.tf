@@ -1,15 +1,15 @@
 # OPTIONS are needed for CORS
-resource "aws_api_gateway_method" "options_method" {
+resource "aws_api_gateway_method" "options" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_method_response" "options_200" {
+resource "aws_api_gateway_method_response" "options" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.options_method.http_method
+  http_method = aws_api_gateway_method.options.http_method
   status_code = "200"
 
   response_models = {
@@ -27,17 +27,17 @@ resource "aws_api_gateway_method_response" "options_200" {
 resource "aws_api_gateway_integration" "options" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.options_method.http_method
+  http_method = aws_api_gateway_method.options.http_method
 
   type             = "MOCK"
   content_handling = "CONVERT_TO_TEXT"
 }
 
-resource "aws_api_gateway_integration_response" "options_integration_response" {
+resource "aws_api_gateway_integration_response" "options" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.options_method.http_method
-  status_code = aws_api_gateway_method_response.options_200.status_code
+  http_method = aws_api_gateway_method.options.http_method
+  status_code = aws_api_gateway_method_response.options.status_code
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
