@@ -41,6 +41,8 @@ jobs:
         working-directory: ${{ env.pscale_base_directory }}/cli-helper-scripts/
         run: |
           . use-pscale-docker-image.sh
+          
+          pscale auth login
 
           BRANCHES=$(pscale branch list "$DB_NAME" --org "$ORG_NAME" --format json)
           BRANCH_EXISTS=echo $BRANCHES | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .name"
