@@ -26,6 +26,9 @@ outputs:
   URL_PATH:
     value: ${{ steps.password.outputs.URL_PATH }}
     description: The URL Path
+  DATABASE_URL:
+    value: ${{ steps.password.outputs.DATABASE_URL }}
+    description: The Database URL
 
 runs:
   using: 'composite'
