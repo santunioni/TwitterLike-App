@@ -48,7 +48,7 @@ runs:
         ID_PATH="$BASE_PATH/id"
         URL_PATH="$BASE_PATH/url"
 
-        ID=$(aws ssm get-parameter --name "$ID_PATH" --output json | jq -r '.Parameters[] | select(.Name == "$ID_PATH") | .Value')
+        ID=$(aws ssm get-parameters-by-path --path "$BASE_PATH" --output json | jq -r '.Parameters[] | select(.Name == "$ID_PATH") | .Value')
         FOUND_ID=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.id == \"$ID\") | .id")
 
         if [ ! -n "$FOUND_ID" ]; then
