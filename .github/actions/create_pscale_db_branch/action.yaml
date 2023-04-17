@@ -1,0 +1,54 @@
+name: Create DB Branch
+
+description: Create PlanetScale Database Branch
+
+inputs:
+  db_name:
+    required: true
+    description: The Database Name
+    default: realworld-app
+  org_name:
+    required: true
+    description: The Database Organization Name
+    default: santunioni
+  branch_name:
+    required: true
+    description: The Database Branch Name
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Create database and main branch if it does not exist
+      env:
+        DB_NAME: ${{ inputs.db_name }}
+        ORG_NAME: ${{ inputs.org_name }}
+      shell: bash
+      working-directory: .pscale/cli-helper-scripts
+      run: |
+        . use-pscale-docker-image.sh
+        . wait-for-branch-readiness.sh
+
+        DB_EXISTS=$(pscale database list --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$DB_NAME\") | .name")
+        if [ "$DB_EXISTS" == "$DB_NAME" ]; then
+          exit 0
+        fi
+
+        pscale database create $DB_NAME --org "$ORG_NAME"
+        wait_for_branch_readiness 10 "$DB_NAME" main "$ORG_NAME" 30
+        pscale branch promote $DB_NAME main --org "$ORG_NAME"
+
+    - name: Create branch ${{ inputs.name }} if it does not exist
+      env:
+        DB_NAME: ${{ inputs.db_name }}
+        ORG_NAME: ${{ inputs.org_name }}
+        BRANCH_NAME: ${{ inputs.branch_name }}
+      if: ${{ inputs.name != 'main' }}
+      shell: bash
+      working-directory: .pscale/cli-helper-scripts
+      run: |
+        . use-pscale-docker-image.sh
+
+        BRANCH_EXISTS=$(pscale branch list "$DB_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .name")
+        if [ "$BRANCH_EXISTS" != "$BRANCH_NAME" ]; then
+            pscale branch create $DB_NAME $BRANCH_NAME --org "$ORG_NAME" --wait
+        fi

@@ -1,0 +1,64 @@
+name: Create PlanetScale Branch Password
+
+description: Create PlanetScale Branch Password and export it to SSM Parameter Store
+
+inputs:
+  db_name:
+    required: true
+    description: The Database Name
+    default: realworld-app
+  org_name:
+    required: true
+    description: The Database Organization Name
+    default: santunioni
+  branch_name:
+    required: true
+    description: The Database Branch Name
+  password_name:
+    required: true
+    description: The Database Password Name
+    default: application
+
+outputs:
+  ID_PATH:
+    value: ${{ steps.password.outputs.ID_PATH }}
+    description: The ID Path
+  URL_PATH:
+    value: ${{ steps.password.outputs.URL_PATH }}
+    description: The URL Path
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Create ${{ inputs.branch_name }} branch password if it does not exist
+      shell: bash
+      id: password
+      working-directory: .pscale/cli-helper-scripts
+      env:
+        DB_NAME: ${{ inputs.db_name }}
+        ORG_NAME: ${{ inputs.org_name }}
+        BRANCH_NAME: ${{ inputs.branch_name }}
+        PASSWORD_NAME: ${{ inputs.password_name }}
+      run: |
+        . use-pscale-docker-image.sh        
+        BASE_PATH="/pscale/$ORG_NAME/$DB_NAME/$BRANCH_NAME/$PASSWORD_NAME"
+        ID_PATH="$BASE_PATH/id"
+        URL_PATH="$BASE_PATH/url"
+
+        PARAMETERS=$(aws ssm get-parameters-by-path --path "$BASE_PATH" --output json)
+        ID=$(echo $PARAMETERS | jq -r '.Parameters[] | select(.Name == "$ID_PATH") | .Value')
+        URL=$(echo $PARAMETERS | jq -r '.Parameters[] | select(.Name == "$URL_PATH") | .Value')
+
+        FOUND_ID=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.id == \"$ID\") | .id")
+
+        if [ ! -n "$FOUND_ID" ]; then
+          raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_NAME" --org "$ORG_NAME" --format json)
+          ID=$(echo "$raw_db_url" |  jq -r ".id")
+          URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/$DB_NAME\"")
+
+          aws ssm put-parameter --name "$ID_PATH" --value "$ID" --type String --overwrite
+          aws ssm put-parameter --name "$URL_PATH" --value "$URL" --type SecureString --overwrite
+        fi
+
+        echo "ID_PATH=$ID_PATH" >> $GITHUB_OUTPUT
+        echo "URL_PATH=$URL_PATH" >> $GITHUB_OUTPUT
