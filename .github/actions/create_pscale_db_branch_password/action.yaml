@@ -62,3 +62,4 @@ runs:
 
         echo "ID_PATH=$ID_PATH" >> $GITHUB_OUTPUT
         echo "URL_PATH=$URL_PATH" >> $GITHUB_OUTPUT
+        echo "DATABASE_URL=$URL" >> $GITHUB_OUTPUT

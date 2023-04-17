@@ -50,17 +50,13 @@ jobs:
           org_name: santunioni
           branch_name: sandbox
 
-      - id: paths
+      - id: dburl
         name: Create DB Branch Password
         uses: ./.github/actions/create_pscale_db_branch_password
         with:
           db_name: realworld-app
           org_name: santunioni
           branch_name: sandbox
-
-      - id: dburl
-        shell: bash
-        run: echo "DATABASE_URL=$(aws ssm get-parameter --name ${{ steps.paths.outputs.URL_PATH }} --with-decryption --query "Parameter.Value" --output text)" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v3
         with:
