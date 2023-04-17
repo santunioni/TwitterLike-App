@@ -48,10 +48,7 @@ runs:
         ID_PATH="$BASE_PATH/id"
         URL_PATH="$BASE_PATH/url"
 
-        PARAMETERS=$(aws ssm get-parameters-by-path --path "$BASE_PATH" --output json)
-        ID=$(echo $PARAMETERS | jq -r '.Parameters[] | select(.Name == "$ID_PATH") | .Value')
-        URL=$(echo $PARAMETERS | jq -r '.Parameters[] | select(.Name == "$URL_PATH") | .Value')
-
+        ID=$(aws ssm get-parameter --name "$ID_PATH" --output json | jq -r '.Parameters[] | select(.Name == "$ID_PATH") | .Value')
         FOUND_ID=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.id == \"$ID\") | .id")
 
         if [ ! -n "$FOUND_ID" ]; then
@@ -61,6 +58,8 @@ runs:
 
           aws ssm put-parameter --name "$ID_PATH" --value "$ID" --type String --overwrite
           aws ssm put-parameter --name "$URL_PATH" --value "$URL" --type SecureString --overwrite
+        else
+          URL=$(aws ssm get-parameter --name "$URL_PATH" --with-decryption --output json | jq -r ".Parameter.Value")
         fi
 
         echo "ID_PATH=$ID_PATH" >> $GITHUB_OUTPUT
