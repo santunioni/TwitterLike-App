@@ -85,7 +85,6 @@ jobs:
 
       - id: terraform
         name: Deploy ${{ steps.environment.outputs.name }}
-        working-directory: terraform
         run: |
           make aws/terraform
           cd terraform
