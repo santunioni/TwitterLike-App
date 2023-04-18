@@ -46,17 +46,17 @@ jobs:
       - name: Create DB Branch
         uses: ./.github/actions/create_pscale_db_branch
         with:
-          db_name: realworld-app
-          org_name: santunioni
-          branch_name: sandbox
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ steps.environment.outputs.name }}
 
       - id: dburl
         name: Create DB Branch Password
         uses: ./.github/actions/create_pscale_db_branch_password
         with:
-          db_name: realworld-app
-          org_name: santunioni
-          branch_name: sandbox
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ steps.environment.outputs.name }}
 
       - uses: actions/setup-node@v3
         with:
@@ -84,7 +84,8 @@ jobs:
           name: build
 
       - id: terraform
-        name: Deploy Sandbox
+        name: Deploy ${{ steps.environment.outputs.name }}
+        working-directory: terraform
         run: |
           make aws/terraform
           cd terraform
@@ -93,7 +94,7 @@ jobs:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
 
-      - name: Wait Sandbox
+      - name: Wait ${{ steps.environment.outputs.name }}
         run: |
           ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/checks/readiness" 200
           ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/articles" 200
@@ -115,3 +116,17 @@ jobs:
           DRIVER: rest
           API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
           TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
+
+      - name: Turn Down Computing
+        working-directory: terraform
+        run: |
+          terraform destroy -auto-approve
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+
+      - name: Turn Down Database
+        working-directory: .pscale/cli-helper-scripts
+        run: |
+          . use-pscale-docker-image.sh
+          pscale branch delete $DB_NAME $TF_VAR_ENVIRONMENT --org $ORG_NAME --force
