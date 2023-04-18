@@ -129,4 +129,6 @@ jobs:
         working-directory: .pscale/cli-helper-scripts
         run: |
           . use-pscale-docker-image.sh
-          pscale branch delete $DB_NAME $TF_VAR_ENVIRONMENT --org $ORG_NAME --force
+          pscale branch delete $DB_NAME $BRANCH_NAME --org $ORG_NAME --force
+        env:
+          BRANCH_NAME: ${{ steps.environment.outputs.name }}
