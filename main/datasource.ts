@@ -34,6 +34,7 @@ export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
     migrationsTransactionMode: 'each',
     synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
+    logging: Boolean(process.env.DEBUG),
     ssl: pscaleDatabase
       ? {
           requestCert: true,
@@ -49,9 +50,7 @@ export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
 }
 
 export function createUnitTestDataSource() {
-  const datasource = createDataSourceInstance({
-    logging: Boolean(process.env.DEBUG),
-  })
+  const datasource = createDataSourceInstance()
   require('assert')(
     datasource.options.type === 'mysql' &&
       datasource.options.url?.includes('localhost'),

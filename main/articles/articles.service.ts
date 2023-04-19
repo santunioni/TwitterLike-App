@@ -51,7 +51,9 @@ export class ArticleView {
       throw new ArticleNotFound(slug)
     }
     if (articles.length > 1) {
-      throw new Error('Multiple articles with the same slug')
+      throw new Error(
+        `Multiple articles with the same slug: ${JSON.stringify(articles)}`,
+      )
     }
     const article = articles[0]
     return await this.addTagsAndAuthorToArticle(article)

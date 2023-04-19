@@ -145,6 +145,30 @@ describe('ArticlesView', () => {
     expect(dates).toEqual(dates.sort((a, b) => b.getTime() - a.getTime()))
     expect(dates.length).toBeGreaterThanOrEqual(createdArticles.length)
   })
+
+  it('should return article by slug when author creates many articles', async () => {
+    // Arrange
+    const cms = service.getCMS(author)
+    const createdArticles = await Promise.all([
+      cms.createArticle(makeRandomArticle()),
+      cms.createArticle(makeRandomArticle()),
+      cms.createArticle(makeRandomArticle()),
+    ])
+    const createdArticle = createdArticles[0]
+
+    // Act
+    const article = await service
+      .getView(author)
+      .getArticle(createdArticle.slug)
+
+    // Assert
+    expect(article).toMatchObject({
+      ...createdArticle,
+      tags: expect.arrayContaining(createdArticle.tags),
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+    })
+  })
 })
 
 describe('ContentManagementSystem', () => {

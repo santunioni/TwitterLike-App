@@ -60,7 +60,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
     }
 
     if (options.owner) {
-      qb.andWhere(`published = true OR ${qb.alias}.author_id = :authorId`, {
+      qb.andWhere(`(published = true OR ${qb.alias}.author_id = :authorId)`, {
         authorId: options.owner.id,
       })
     } else {

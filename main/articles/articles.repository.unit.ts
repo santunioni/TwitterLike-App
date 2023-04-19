@@ -22,9 +22,11 @@ afterAll(async () => {
 })
 
 let testRandomNumber: number
+let authorId: number
 
 beforeEach(async () => {
   testRandomNumber = Date.now() % 10 ** 9
+  authorId = testRandomNumber
 })
 
 describe('ArticlesRepository', () => {
@@ -37,11 +39,11 @@ describe('ArticlesRepository', () => {
     // Act
     const createdArticle = await articlesRepository.createArticle(
       { title, slug, body, description },
-      { id: testRandomNumber },
+      { id: authorId },
     )
     const queriedArticle = await articlesRepository.getArticles({
       filterBySlug: slug,
-      owner: { id: testRandomNumber },
+      owner: { id: authorId },
     })
 
     // Assert
@@ -54,7 +56,7 @@ describe('ArticlesRepository', () => {
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       author: {
-        id: testRandomNumber,
+        id: authorId,
       },
     }
     expect(createdArticle).toMatchObject(matchObject)
@@ -68,18 +70,18 @@ describe('ArticlesRepository', () => {
     })
     await articlesRepository.createArticle(
       { title, slug, body, description },
-      { id: testRandomNumber },
+      { id: authorId },
     )
 
     // Act
     const updatedArticle = await articlesRepository.updateArticle(
       slug,
-      { id: testRandomNumber },
+      { id: authorId },
       { body: 'Blabla' },
     )
     const queriedArticle = await articlesRepository.getArticles({
       filterBySlug: slug,
-      owner: { id: testRandomNumber },
+      owner: { id: authorId },
     })
 
     // Assert
@@ -92,7 +94,7 @@ describe('ArticlesRepository', () => {
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       author: {
-        id: testRandomNumber,
+        id: authorId,
       },
     }
     expect(updatedArticle).toMatchObject(matchObject)
