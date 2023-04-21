@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build:lambda": "ncc build src/lambda.ts --minify --out build/lambda && cd build/lambda && zip ../../terraform/lambda.zip ./index.js && cd - && rm -rf build/lambda",
+    "build:lambda": "ncc build src/lambda.ts --minify --out build/lambda && cd build/lambda && zip -r ../../terraform/lambda.zip * && cd - && rm -rf build/lambda",
     "build:server": "ncc build src/server.ts --minify --out build/server",
     "build": "npm run build:lambda && npm run build:server",
     "build:server:start": "NODE_ENV=production node build/server/index.js",
