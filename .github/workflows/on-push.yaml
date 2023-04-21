@@ -1,4 +1,6 @@
-name: Continuous Delivery Pipeline
+name: Continuous Delivery
+
+run-name: Continuous Delivery
 
 on:
   push:

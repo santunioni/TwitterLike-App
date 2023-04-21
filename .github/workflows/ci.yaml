@@ -1,7 +1,16 @@
 name: Continuous Integration
 
+run-name: Integration
+
 on:
   workflow_call:
+
+env:
+  pscale_base_directory: .pscale
+  DB_NAME: realworld-app
+  ORG_NAME: santunioni
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
 
 jobs:
   checks:
@@ -96,23 +105,11 @@ jobs:
     name: Lambda Tests
     needs: checks
 
-    concurrency:
-      group: sandbox
-      cancel-in-progress: false
-
     runs-on: ubuntu-latest
 
     permissions:
       id-token: write
       contents: read
-
-    env:
-      pscale_base_directory: .pscale
-      DB_NAME: realworld-app
-      GITHUB_USER: ${{ github.actor }}
-      ORG_NAME: santunioni
-      PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
-      PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
 
     defaults:
       run:
@@ -124,12 +121,7 @@ jobs:
       - uses: ./.github/actions/credentials
 
       - id: environment
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-        run: |
-          NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
-          NAME=sandbox
-          echo "name=$NAME" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/get_branch_environment_name
 
       - name: Create DB Branch
         uses: ./.github/actions/create_pscale_db_branch
@@ -204,33 +196,3 @@ jobs:
           name: build
           path: |
             packages/server/terraform/lambda.zip
-
-      - name: Turn Down Computing
-        working-directory: packages/server/terraform
-        run: |
-          terraform destroy -auto-approve
-        env:
-          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
-          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
-
-      - name: Turn Down Database
-        working-directory: .pscale/cli-helper-scripts
-        run: |
-          . use-pscale-docker-image.sh
-          pscale branch delete $DB_NAME $BRANCH_NAME --org $ORG_NAME --force
-        env:
-          BRANCH_NAME: ${{ steps.environment.outputs.name }}
-
-  checkpackage:
-    runs-on: ubuntu-latest
-    needs: [lambda]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: build
-      - uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: packages/server/terraform
-      - run: tree -L 5
