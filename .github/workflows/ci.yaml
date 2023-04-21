@@ -71,7 +71,7 @@ jobs:
           TRPC_URL: http://localhost:3000/trpc
 
       - name: Uploading Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build
           path: |

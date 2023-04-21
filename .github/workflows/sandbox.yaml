@@ -81,14 +81,11 @@ jobs:
         with:
           name: build
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - id: terraform
         name: Deploy ${{ steps.environment.outputs.name }}
         working-directory: packages/server/terraform
         run: |
-          terraform init -reconfigure -backend-config="key=realworld-app/$(TF_VAR_ENVIRONMENT)/lambda.tfstate"
+          terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
           terraform refresh
           terraform apply -auto-approve
           echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
