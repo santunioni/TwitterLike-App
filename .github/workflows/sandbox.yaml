@@ -81,6 +81,9 @@ jobs:
         with:
           name: build
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - id: terraform
         name: Deploy ${{ steps.environment.outputs.name }}
         working-directory: packages/server/terraform
