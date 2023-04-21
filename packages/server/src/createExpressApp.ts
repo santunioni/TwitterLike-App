@@ -1,15 +1,15 @@
-import { getEnvs } from './environment'
-import { createContext } from './trpc/app'
-import { createMergedTRPCApp } from './trpc/merged'
-import { CommentsController } from './comments/comments.controller'
+import { NestFactory } from '@nestjs/core'
+import { SwaggerModule } from '@nestjs/swagger'
+import * as trpcExpress from '@trpc/server/adapters/express'
+import * as express from 'express'
 import { ArticlesController } from './articles/articles.controller'
 import { AuthorsController } from './authors/authors.controller'
-import { NestFactory } from '@nestjs/core'
+import { CommentsController } from './comments/comments.controller'
+import { getEnvs } from './environment'
 import { AppModule } from './nest/app.module'
-import { SwaggerModule } from '@nestjs/swagger'
 import { createPreConfiguredOpenAPIDocumentBuilder } from './nest/openapi'
-import * as express from 'express'
-import * as trpcExpress from '@trpc/server/adapters/express'
+import { createContext } from './trpc/app'
+import { createMergedTRPCApp } from './trpc/merged'
 
 export async function createNestApplication(baseApiUrl: string) {
   const nest = await NestFactory.create(AppModule)

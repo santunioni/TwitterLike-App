@@ -13,5 +13,5 @@
       "@/*": ["./packages/*/src"]
     }
   },
-  "exclude": ["node_modules", "dist", "bin", "migrations", "**/*.mock.ts"]
+  "exclude": ["node_modules", "dist"]
 }

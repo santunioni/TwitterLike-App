@@ -1,5 +1,5 @@
-import { ArticleSearchFields, PartialArticle, UserDriver } from './UserDriver'
 import { makeRandomArticle } from '@packages/server/src'
+import { ArticleSearchFields, PartialArticle, UserDriver } from './UserDriver'
 
 export class UserDSL {
   constructor(

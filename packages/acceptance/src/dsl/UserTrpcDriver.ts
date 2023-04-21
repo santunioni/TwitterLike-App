@@ -1,3 +1,4 @@
+import type { AppRouter } from '@packages/server/src'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 import { FetchEsque, HeadersEsque } from '@trpc/client/dist/internals/types'
 import { ResponseEsque } from '@trpc/client/src/internals/types'
@@ -15,7 +16,6 @@ import {
   UserDriver,
 } from './UserDriver'
 import { UserRestDriver } from './UserRestDriver'
-import type { AppRouter } from '@packages/server/src'
 
 function convertAxiosHeadersToTrpcHeaders(
   headers?: RawAxiosResponseHeaders | AxiosResponseHeaders,

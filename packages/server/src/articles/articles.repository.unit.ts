@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm'
 import { createUnitTestDataSource } from '../datasource'
+import { makeRandomArticle } from './articles.mock'
 import { ArticlesRepository, TagsRepository } from './articles.repository'
 import {
   TypeORMArticlesRepository,
   TypeORMTagsRepository,
 } from './articles.repository.typeorm'
-import { makeRandomArticle } from './articles.mock'
 
 let dataSource: DataSource
 let tagsRepository: TagsRepository
