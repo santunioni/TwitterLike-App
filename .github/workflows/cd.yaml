@@ -42,8 +42,11 @@ jobs:
           terraform_wrapper: false
 
       - uses: actions/download-artifact@v3
+        id: download
         with:
           name: build
+
+      - run: mv ${{ steps.download.outputs.download-path }}/lambda.zip packages/server/terraform/lambda.zip
 
       - id: terraform
         name: Deploy ${{ steps.environment.outputs.name }}

@@ -5,6 +5,33 @@ on:
 
 jobs:
   checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
+
+      - run: npm install
+        shell: bash
+        name: Dependencies
+
+      - name: Prettier
+        run: npx prettier --check .
+
+      - name: Typescript
+        run: |
+          npm run typecheck --workspace packages/server
+          npm run typecheck --workspace packages/acceptance
+
+  server:
+    name: Server Tests
+    needs: checks
     services:
       mysql:
         image: mysql:5.6
@@ -34,14 +61,6 @@ jobs:
         shell: bash
         name: Dependencies
 
-      - name: Prettier
-        run: npx prettier --check .
-
-      - name: Typescript
-        run: |
-          npm run typecheck --workspace packages/server
-          npm run typecheck --workspace packages/acceptance
-
       - run: |
           npm run migration:run --workspace packages/server
           npm run migration:check --workspace packages/server
@@ -55,7 +74,7 @@ jobs:
       - name: Building Application
         shell: bash
         run: |
-          npm run build --workspace packages/server
+          npm run --workspace packages/server build:server
 
       - name: Starting localhost server
         shell: bash
@@ -70,9 +89,130 @@ jobs:
           API_URL: http://localhost:3000/api
           TRPC_URL: http://localhost:3000/trpc
 
+  lambda:
+    name: Lambda Tests
+    needs: checks
+
+    concurrency:
+      group: sandbox
+      cancel-in-progress: false
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      pscale_base_directory: .pscale
+      DB_NAME: realworld-app
+      GITHUB_USER: ${{ github.actor }}
+      ORG_NAME: santunioni
+      PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
+      PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./.github/actions/credentials
+
+      - id: environment
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          NAME=$(echo $BRANCH_NAME | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+          NAME=sandbox
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+
+      - name: Create DB Branch
+        uses: ./.github/actions/create_pscale_db_branch
+        with:
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ steps.environment.outputs.name }}
+
+      - id: dburl
+        name: Create DB Branch Password
+        uses: ./.github/actions/create_pscale_db_branch_password
+        with:
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ steps.environment.outputs.name }}
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.4
+          terraform_wrapper: false
+
+      - run: npm install
+        shell: bash
+        name: Dependencies
+
+      - run: npm run migration:run --workspace packages/server
+        shell: bash
+        name: Migrations
+        env:
+          DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+
+      - run: npm run --workspace packages/server build:lambda
+        name: Build Lambda
+
+      - id: terraform
+        name: Deploy ${{ steps.environment.outputs.name }}
+        working-directory: packages/server/terraform
+        run: |
+          terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
+          terraform refresh
+          terraform apply -auto-approve
+          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+
+      - name: Wait ${{ steps.environment.outputs.name }}
+        run: |
+          ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/checks/readiness" 200
+          ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/articles" 200
+        env:
+          API_GATEWAY_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}
+
+      - run: npm run test --workspace packages/acceptance
+        shell: bash
+        name: Acceptance Tests
+        env:
+          API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
+          TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
+
       - name: Uploading Build
         uses: actions/upload-artifact@v3
         with:
           name: build
           path: |
             packages/server/terraform/lambda.zip
+
+      - name: Turn Down Computing
+        working-directory: packages/server/terraform
+        run: |
+          terraform destroy -auto-approve
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+
+      - name: Turn Down Database
+        working-directory: .pscale/cli-helper-scripts
+        run: |
+          . use-pscale-docker-image.sh
+          pscale branch delete $DB_NAME $BRANCH_NAME --org $ORG_NAME --force
+        env:
+          BRANCH_NAME: ${{ steps.environment.outputs.name }}
