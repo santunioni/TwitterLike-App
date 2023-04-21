@@ -30,9 +30,7 @@ export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
       TagEntity,
       ArticlesHaveTagsEntity,
     ],
-    migrations: ['migrations/*.ts'],
-    migrationsTransactionMode: 'each',
-    synchronize: true,
+    synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
     logging: Boolean(process.env.DEBUG),
     ssl: pscaleDatabase
