@@ -75,4 +75,4 @@ jobs:
         with:
           name: build
           path: |
-            terraform/lambda.zip
+            packages/server/terraform/lambda.zip
