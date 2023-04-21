@@ -8,7 +8,3 @@ infra/up:
 
 format:
 	npx prettier --write .
-
-planetscale/migrations:
-	npm run typeorm schema:drop
-	npm run typeorm migration:run
