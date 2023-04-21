@@ -25,7 +25,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
 
       - run: npm install
         shell: bash
@@ -38,49 +41,36 @@ jobs:
         run: npx tsc --noEmit
 
       - run: |
-          npm run migration:run
-          npm run migration:check
+          npm run migration:run --workspace packages/server
+          npm run migration:check --workspace packages/server
         shell: bash
         name: Migrations
 
-      - run: npm run test:unit
+      - run: npm run test --workspace packages/server
         shell: bash
-        name: Unit Tests
+        name: Server Unit Tests
 
       - name: Building Application
         shell: bash
         run: |
-          make build setup
+          npm run build --workspace packages/server
 
       - name: Starting localhost server
         shell: bash
         run: |
-          make nohup/local
+          nohup sh -c 'npm run build:server:start --workspace packages/server' &
+          ./scripts/wait_for_status.sh http://localhost:3000/api/checks/readiness 200
 
-      - run: npm run test:acceptance
+      - run: npm run test --workspace packages/acceptance
         shell: bash
-        name: Acceptance TRPC Tests
+        name: Acceptance Tests
         env:
-          DRIVER: trpc
           API_URL: http://localhost:3000/api
           TRPC_URL: http://localhost:3000/trpc
-
-      - run: npm run test:acceptance
-        shell: bash
-        name: Acceptance REST Tests
-        env:
-          DRIVER: rest
-          API_URL: http://localhost:3000/api
-          TRPC_URL: http://localhost:3000/trpc
-
-      - name: Zipping Build
-        shell: bash
-        run: |
-          make zip
 
       - name: Uploading Build
         uses: actions/upload-artifact@v2
         with:
           name: build
           path: |
-            build.zip
+            terraform/lambda.zip

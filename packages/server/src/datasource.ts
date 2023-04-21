@@ -32,7 +32,7 @@ export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
     ],
     migrations: ['migrations/*.ts'],
     migrationsTransactionMode: 'each',
-    synchronize: false,
+    synchronize: true,
     namingStrategy: new SnakeNamingStrategy(),
     logging: Boolean(process.env.DEBUG),
     ssl: pscaleDatabase

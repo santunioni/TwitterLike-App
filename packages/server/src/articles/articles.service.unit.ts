@@ -1,5 +1,4 @@
 import { DataSource } from 'typeorm'
-import { makeRandomArticle } from '../__mocks__/articles'
 import { AuthorsService } from '../authors/authors.service'
 import { createUnitTestDataSource } from '../datasource'
 import { Article, Sluged, Tagged } from './articles.models'
@@ -8,6 +7,7 @@ import {
   TypeORMTagsRepository,
 } from './articles.repository.typeorm'
 import { ArticleNotFound, ArticlesService } from './articles.service'
+import { makeRandomArticle } from './articles.mock'
 
 let dataSource: DataSource
 let service: ArticlesService

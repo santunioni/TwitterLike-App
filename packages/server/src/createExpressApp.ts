@@ -1,15 +1,15 @@
-import { NestFactory } from '@nestjs/core'
-import { SwaggerModule } from '@nestjs/swagger'
-import * as trpcExpress from '@trpc/server/adapters/express'
-import * as express from 'express'
-import { AppModule } from './app.module'
-import { ArticlesController } from './articles/articles.controller'
-import { AuthorsController } from './authors/authors.controller'
-import { CommentsController } from './comments/comments.controller'
 import { getEnvs } from './environment'
-import { createPreConfiguredOpenAPIDocumentBuilder } from './nest/openapi'
 import { createContext } from './trpc/app'
 import { createMergedTRPCApp } from './trpc/merged'
+import { CommentsController } from './comments/comments.controller'
+import { ArticlesController } from './articles/articles.controller'
+import { AuthorsController } from './authors/authors.controller'
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './nest/app.module'
+import { SwaggerModule } from '@nestjs/swagger'
+import { createPreConfiguredOpenAPIDocumentBuilder } from './nest/openapi'
+import * as express from 'express'
+import * as trpcExpress from '@trpc/server/adapters/express'
 
 export async function createNestApplication(baseApiUrl: string) {
   const nest = await NestFactory.create(AppModule)
@@ -51,17 +51,3 @@ export async function createExpressApp() {
 
   return app
 }
-
-async function bootstrapServer(): Promise<void> {
-  const { API_PORT } = getEnvs()
-  const app = await createExpressApp()
-  await app.listen(API_PORT)
-}
-
-if (require.main === module) {
-  bootstrapServer()
-    .then(() => console.log('Nest application started.'))
-    .catch(() => console.log('Gracefully shutting down application.'))
-}
-
-export type { AppRouter } from './trpc/merged'

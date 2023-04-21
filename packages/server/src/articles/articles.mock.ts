@@ -1,6 +1,6 @@
 import { LoremIpsum } from 'lorem-ipsum'
-import { Article, Tagged } from '../articles/articles.models'
-import { slugify } from '../articles/slugify'
+import { Article, Tagged } from './articles.models'
+import { slugify } from './slugify'
 
 const lorem = new LoremIpsum()
 

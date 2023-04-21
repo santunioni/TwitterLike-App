@@ -8,7 +8,6 @@ import axios, {
   RawAxiosRequestHeaders,
   RawAxiosResponseHeaders,
 } from 'axios'
-import type { AppRouter } from '../../main/server'
 import {
   Article,
   ArticleSearchFields,
@@ -16,6 +15,7 @@ import {
   UserDriver,
 } from './UserDriver'
 import { UserRestDriver } from './UserRestDriver'
+import type { AppRouter } from '@packages/server/src'
 
 function convertAxiosHeadersToTrpcHeaders(
   headers?: RawAxiosResponseHeaders | AxiosResponseHeaders,

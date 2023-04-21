@@ -1,7 +1,7 @@
 import { Context } from 'aws-lambda'
 import * as serverlessExpress from 'aws-serverless-express'
 import { Server } from 'http'
-import { createExpressApp } from './server'
+import { createExpressApp } from './createExpressApp'
 
 let lambdaProxyServer: Server
 

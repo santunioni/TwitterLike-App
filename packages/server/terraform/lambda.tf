@@ -35,9 +35,9 @@ resource "aws_lambda_function" "realworld_api_function" {
       VERSION      = data.external.git.result.sha
     }
   }
-  filename         = "${path.module}/../build.zip"
-  source_code_hash = filebase64sha256("${path.module}/../build.zip")
-  handler          = "lambda.handler"
+  filename         = "${path.module}/lambda.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda.zip")
+  handler          = "index.handler"
   runtime          = "nodejs16.x"
   timeout          = 60 * 5
   memory_size      = 516

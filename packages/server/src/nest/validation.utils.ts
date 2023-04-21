@@ -1,23 +1,6 @@
-import {
-  Body,
-  HttpException,
-  HttpStatus,
-  Query,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Body, HttpException, HttpStatus, Query } from '@nestjs/common'
 import { PipeTransform } from '@nestjs/common/interfaces/features/pipe-transform.interface'
 import { ZodError, ZodType } from 'zod'
-
-export function validateModel(
-  status: HttpStatus = HttpStatus.NOT_ACCEPTABLE,
-): ValidationPipe {
-  return new ValidationPipe({
-    transform: true,
-    errorHttpStatusCode: status.valueOf(),
-    transformOptions: { enableImplicitConversion: true },
-    forbidNonWhitelisted: true,
-  })
-}
 
 export function createZodTransformer<ZT extends ZodType>(
   schema: ZT,

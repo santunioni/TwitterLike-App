@@ -1,5 +1,5 @@
-import { makeRandomArticle } from '../../main/__mocks__/articles'
 import { ArticleSearchFields, PartialArticle, UserDriver } from './UserDriver'
+import { makeRandomArticle } from '@packages/server/src'
 
 export class UserDSL {
   constructor(

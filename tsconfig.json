@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "es2017",
+    "composite": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "experimentalDecorators": true,
+    "pretty": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "incremental": true,
     "skipLibCheck": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "paths": {
+      "@/*": ["./packages/*/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "bin", "migrations", "**/*.mock.ts"]
 }

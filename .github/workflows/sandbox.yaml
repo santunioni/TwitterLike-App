@@ -56,7 +56,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
 
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -80,9 +83,11 @@ jobs:
 
       - id: terraform
         name: Deploy ${{ steps.environment.outputs.name }}
+        working-directory: packages/server/terraform
         run: |
-          make aws/terraform
-          cd terraform
+          terraform init -reconfigure -backend-config="key=realworld-app/$(TF_VAR_ENVIRONMENT)/lambda.tfstate"
+          terraform refresh
+          terraform apply -auto-approve
           echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
@@ -95,24 +100,15 @@ jobs:
         env:
           API_GATEWAY_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}
 
-      - run: npm run test:acceptance
+      - run: npm run test --workspace packages/acceptance
         shell: bash
-        name: Acceptance TRPC Tests
+        name: Acceptance Tests
         env:
-          DRIVER: trpc
-          API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
-          TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
-
-      - run: npm run test:acceptance
-        shell: bash
-        name: Acceptance REST Tests
-        env:
-          DRIVER: rest
           API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
           TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
 
       - name: Turn Down Computing
-        working-directory: terraform
+        working-directory: packages/server/terraform
         run: |
           terraform destroy -auto-approve
         env:
