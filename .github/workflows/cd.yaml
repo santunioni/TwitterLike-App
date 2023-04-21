@@ -13,13 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Authenticate on PlanetScale
-        working-directory: .pscale/cli-helper-scripts
-        shell: bash
-        run: |
-          . use-pscale-docker-image.sh
-          pscale auth login
-
       - uses: ./.github/actions/credentials
 
       - id: dburl

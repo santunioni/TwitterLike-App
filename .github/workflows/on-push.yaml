@@ -16,6 +16,7 @@ jobs:
   sandbox:
     uses: ./.github/workflows/sandbox.yaml
     needs: [ci]
+    secrets: inherit
 
   cd:
     needs: [sandbox]
