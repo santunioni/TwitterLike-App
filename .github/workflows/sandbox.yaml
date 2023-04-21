@@ -70,7 +70,7 @@ jobs:
         shell: bash
         name: Dependencies
 
-      - run: npm run migration:run
+      - run: npm run migration:run --workspace packages/server
         shell: bash
         name: Migrations
         env:

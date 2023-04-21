@@ -30,7 +30,7 @@ jobs:
         shell: bash
         name: Dependencies
 
-      - run: npm run migration:run
+      - run: npm run migration:run --workspace packages/server
         shell: bash
         name: Migrations
         env:
@@ -46,7 +46,12 @@ jobs:
           name: build
 
       - id: terraform
-        run: make aws/terraform
+        name: Deploy ${{ steps.environment.outputs.name }}
+        working-directory: packages/server/terraform
+        run: |
+          terraform init -reconfigure -backend-config="key=realworld-app/production/lambda.tfstate"
+          terraform refresh
+          terraform apply -auto-approve
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: production
