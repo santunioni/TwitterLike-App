@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import { ZodBody } from '../nest/validation.utils'
 import { UsersService } from './accounts.service'
+import { User } from '../nest/jwt.guard'
 
 const CreateUserDTO = z.object({
   email: z.string().email(),
@@ -49,7 +50,7 @@ export class AccountsController {
   @UseGuards(BasicAuthGuard)
   @ApiBasicAuth()
   @Post('login')
-  login(@Req() req) {
+  login(@Req() req: { user: User }) {
     return this.service.getJWTResponse(req.user)
   }
 }

@@ -1,12 +1,9 @@
 import type { AppRouter } from '@packages/server/src'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
-import { FetchEsque, HeadersEsque } from '@trpc/client/dist/internals/types'
-import { ResponseEsque } from '@trpc/client/src/internals/types'
+import type { HeadersEsque } from '@trpc/client/dist/internals/types'
 import axios, {
-  AxiosHeaders,
   AxiosResponse,
   AxiosResponseHeaders,
-  RawAxiosRequestHeaders,
   RawAxiosResponseHeaders,
 } from 'axios'
 import {
@@ -34,9 +31,7 @@ function convertAxiosHeadersToTrpcHeaders(
   }
 }
 
-function convertAxiosResponseToFetchResponse(
-  response: AxiosResponse,
-): ResponseEsque {
+function convertAxiosResponseToFetchResponse(response: AxiosResponse) {
   const ok = response.status < 500
   return {
     ok,
@@ -48,28 +43,7 @@ function convertAxiosResponseToFetchResponse(
     url: response.config.url ?? '',
     redirected: false,
     type: ok ? 'basic' : 'error',
-  }
-}
-
-function convertFetchHeadersToAxiosHeaders(
-  headers: HeadersInit | undefined,
-): AxiosHeaders | RawAxiosRequestHeaders | undefined {
-  return headers
-    ? Object.entries(headers).reduce((acc, [key, value]) => {
-        acc[key] = value
-        return acc
-      }, {} as Record<string, string>)
-    : undefined
-}
-
-const axiosFetchImplementation: FetchEsque = async (input, init) => {
-  const response = await axios.request({
-    url: input.toString(),
-    method: init?.method,
-    data: init?.body,
-    headers: convertFetchHeadersToAxiosHeaders(init?.headers),
-  })
-  return convertAxiosResponseToFetchResponse(response)
+  } as const
 }
 
 export class UserTrpcDriver implements UserDriver {
@@ -80,7 +54,20 @@ export class UserTrpcDriver implements UserDriver {
   private trpc = createTRPCProxyClient<AppRouter>({
     links: [
       httpBatchLink({
-        fetch: axiosFetchImplementation, // Required because the default fetch implementation is only available on browsers.
+        fetch: async (input, init) => {
+          const response = await axios.request({
+            url: input.toString(),
+            method: init?.method,
+            data: init?.body,
+            headers: init.headers
+              ? Object.entries(init.headers).reduce((acc, [key, value]) => {
+                  acc[key] = value
+                  return acc
+                }, {} as Record<string, any>)
+              : undefined,
+          })
+          return convertAxiosResponseToFetchResponse(response)
+        }, // Required because the default fetch implementation is only available on browsers.
         url: process.env.TRPC_URL ?? 'http://localhost:3000/trpc',
         headers: () => {
           return {
