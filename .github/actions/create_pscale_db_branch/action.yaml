@@ -23,10 +23,9 @@ runs:
         DB_NAME: ${{ inputs.db_name }}
         ORG_NAME: ${{ inputs.org_name }}
       shell: bash
-      working-directory: .pscale/cli-helper-scripts
+      working-directory: scripts/pscale
       run: |
-        . use-pscale-docker-image.sh
-        . wait-for-branch-readiness.sh
+        . functions.sh
 
         DB_EXISTS=$(pscale database list --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$DB_NAME\") | .name")
         if [ "$DB_EXISTS" == "$DB_NAME" ]; then
@@ -44,9 +43,9 @@ runs:
         BRANCH_NAME: ${{ inputs.branch_name }}
       if: ${{ inputs.name != 'main' }}
       shell: bash
-      working-directory: .pscale/cli-helper-scripts
+      working-directory: scripts/pscale
       run: |
-        . use-pscale-docker-image.sh
+        . functions.sh
 
         BRANCH_EXISTS=$(pscale branch list "$DB_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .name")
         if [ "$BRANCH_EXISTS" != "$BRANCH_NAME" ]; then

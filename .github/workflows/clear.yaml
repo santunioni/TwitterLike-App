@@ -54,7 +54,8 @@ jobs:
 
       - name: Turn Down Database
         continue-on-error: true
-        working-directory: .pscale/cli-helper-scripts
+        working-directory: scripts/pscale
         run: |
-          . use-pscale-docker-image.sh
+          . functions.sh
+
           pscale branch delete $DB_NAME ${{ inputs.environment }} --org $ORG_NAME --force

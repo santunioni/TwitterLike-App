@@ -36,14 +36,15 @@ runs:
     - name: Create ${{ inputs.branch_name }} branch password if it does not exist
       shell: bash
       id: password
-      working-directory: .pscale/cli-helper-scripts
+      working-directory: scripts/pscale
       env:
         DB_NAME: ${{ inputs.db_name }}
         ORG_NAME: ${{ inputs.org_name }}
         BRANCH_NAME: ${{ inputs.branch_name }}
         PASSWORD_NAME: ${{ inputs.password_name }}
       run: |
-        . use-pscale-docker-image.sh        
+        . functions.sh    
+
         BASE_PATH="/pscale/$ORG_NAME/$DB_NAME/$BRANCH_NAME/$PASSWORD_NAME"
         ID_PATH="$BASE_PATH/id"
         URL_PATH="$BASE_PATH/url"
