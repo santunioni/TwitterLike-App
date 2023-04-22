@@ -115,7 +115,7 @@ export class ArticlesController {
     const articles = await view.getFeed(pagination)
     return {
       articles: articles.map((article) =>
-        createArticleDTO(article, article.author, undefined),
+        createArticleDTO(article, article.author),
       ),
       links:
         articles.length > 0
@@ -143,7 +143,7 @@ export class ArticlesController {
     const articles = await view.getArticlesByFilters(filters, pagination)
     return {
       articles: articles.map((article) =>
-        createArticleDTO(article, article.author, undefined),
+        createArticleDTO(article, article.author),
       ),
       links:
         articles.length > 0

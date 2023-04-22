@@ -144,7 +144,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
   }
 
   private createArticleResponse(
-    article: ArticleEntity & any,
+    article: any,
   ): Article & { id: number } & Authored & Sluged & Dated {
     article.createdAt = article.createdAt ?? article.created_at
     article.updatedAt = article.updatedAt ?? article.updated_at

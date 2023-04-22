@@ -54,9 +54,7 @@ describe('ArticlesView', () => {
     await cms.publishArticle(exampleArticle.slug)
 
     // Act
-    const article = await service
-      .getView(undefined)
-      .getArticle(exampleArticle.slug)
+    const article = await service.getView().getArticle(exampleArticle.slug)
 
     // Assert
     expect(article).toMatchObject({
@@ -138,7 +136,7 @@ describe('ArticlesView', () => {
     )
 
     // Act
-    const articles = await service.getView(undefined).getFeed()
+    const articles = await service.getView().getFeed()
 
     // Assert
     const dates = articles.map((a) => a.createdAt)

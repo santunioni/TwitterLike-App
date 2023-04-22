@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
@@ -83,27 +82,11 @@ export class AuthorsController {
   }
 
   @ApiBody({
-    schema: zodToJsonSchema(CreateProfileBody) as any,
-  })
-  @HttpCode(HttpStatus.OK)
-  @Put()
-  async update(
-    @RequireUser() user: User,
-    @ZodBody(CreateProfileBody) body: CreateProfileBody,
-  ) {
-    const me = await this.authorsService.updateUserAuthorProfile(
-      user,
-      body.profile,
-    )
-    return createAuthorProfileBody(me)
-  }
-
-  @ApiBody({
     schema: zodToJsonSchema(UpdateProfileBody) as any,
   })
   @HttpCode(HttpStatus.OK)
   @Patch()
-  async partialUpdate(
+  async update(
     @RequireUser() user: User,
     @ZodBody(UpdateProfileBody) body: UpdateProfileBody,
   ) {
