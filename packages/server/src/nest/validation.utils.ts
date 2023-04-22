@@ -2,11 +2,9 @@ import { Body, HttpException, HttpStatus, Query } from '@nestjs/common'
 import { PipeTransform } from '@nestjs/common/interfaces/features/pipe-transform.interface'
 import { ZodError, ZodType } from 'zod'
 
-export function createZodTransformer<ZT extends ZodType>(
-  schema: ZT,
-): PipeTransform<any, ZT['_output']> {
+export function createZodTransformer<ZT extends ZodType>(schema: ZT): PipeTransform<any, ZT['_output']> {
   return {
-    transform: (value, _) => {
+    transform: value => {
       try {
         return schema.parse(value) as ZT['_output']
       } catch (e) {

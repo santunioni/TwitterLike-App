@@ -1,22 +1,16 @@
 import { Axios } from 'axios'
-import {
-  Article,
-  ArticleSearchFields,
-  createCredentials,
-  PartialArticle,
-  UserDriver,
-} from './UserDriver'
+import { Article, ArticleSearchFields, createCredentials, UserDriver } from './UserDriver'
 
 export class UserRestDriver implements UserDriver {
   private axios = new Axios({
     baseURL: process.env.API_URL || 'http://localhost:3000/api',
     responseType: 'json',
-    transformRequest: (data) => (data ? JSON.stringify(data) : data),
-    transformResponse: (data) => (data ? JSON.parse(data) : data),
+    transformRequest: data => (data ? JSON.stringify(data) : data),
+    transformResponse: data => (data ? JSON.parse(data) : data),
     headers: {
       'Content-Type': 'application/json',
     },
-    validateStatus: (status) => status < 500,
+    validateStatus: status => status < 500,
   })
 
   async createAccount(username: string) {
@@ -86,16 +80,12 @@ export class UserRestDriver implements UserDriver {
 
   async shouldFindArticleBy(filters: ArticleSearchFields, slug: string) {
     const articles = await this.findArticles(filters)
-    expect(articles.map((v) => v.slug)).toContainEqual(slug)
+    expect(articles.map(v => v.slug)).toContainEqual(slug)
   }
 
   async shouldNotFindArticleBy(filters: ArticleSearchFields, slug: string) {
     const articles = await this.findArticles(filters)
-    expect(articles.map((v) => v.slug)).not.toContainEqual(slug)
-  }
-
-  async editArticle(slug: string, editions: PartialArticle) {
-    return slug
+    expect(articles.map(v => v.slug)).not.toContainEqual(slug)
   }
 
   async publishArticle(slug: string) {
@@ -124,12 +114,12 @@ export class UserRestDriver implements UserDriver {
 
   async shouldSeeTheArticleInTheFeed(slug: string) {
     const feed = await this.getFeed()
-    expect(feed.map((v) => v.slug)).toContainEqual(slug)
+    expect(feed.map(v => v.slug)).toContainEqual(slug)
   }
 
   async shouldNotSeeTheArticleInTheFeed(slug: string) {
     const feed = await this.getFeed()
-    expect(feed.map((v) => v.slug)).not.toContainEqual(slug)
+    expect(feed.map(v => v.slug)).not.toContainEqual(slug)
   }
 
   private async getArticle(slug: string) {
@@ -151,9 +141,7 @@ export class UserRestDriver implements UserDriver {
   async shouldSeeCommentFrom(slug: string, username: string) {
     const response = await this.axios.get(`articles/${slug}/comments`)
     APISpecValidations.validateGetCommentsResponse(response)
-    expect(response.data.comments.map((v) => v.author.username)).toContainEqual(
-      username,
-    )
+    expect(response.data.comments.map(v => v.author.username)).toContainEqual(username)
   }
 }
 
@@ -170,12 +158,8 @@ class APISpecValidations {
     description: expect.any(String),
     body: expect.any(String),
     tags: expect.arrayContaining([expect.any(String)]),
-    createdAt: expect.stringMatching(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
-    ),
-    updatedAt: expect.stringMatching(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
-    ),
+    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
+    updatedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
     author: APISpecValidations.validAuthor,
     links: {
       self: expect.any(String),
@@ -186,12 +170,8 @@ class APISpecValidations {
 
   private static readonly validComment = {
     id: expect.any(Number),
-    createdAt: expect.stringMatching(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
-    ),
-    updatedAt: expect.stringMatching(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
-    ),
+    createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
+    updatedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/),
     body: expect.any(String),
     author: APISpecValidations.validAuthor,
     links: {

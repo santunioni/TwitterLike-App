@@ -39,9 +39,11 @@ jobs:
       - name: Prettier
         run: npx prettier --check .
 
+      - name: ESLint
+        run: npm run lint --workspaces --if-present
+
       - name: Typescript
-        run: |
-          npm run typecheck --workspaces
+        run: npm run typecheck --workspaces --if-present
 
   server:
     name: Server Tests

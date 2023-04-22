@@ -1,11 +1,8 @@
+import * as assert from 'assert'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 import { AccountEntity } from './accounts/accounts.entity'
-import {
-  ArticleEntity,
-  ArticlesHaveTagsEntity,
-  TagEntity,
-} from './articles/articles.repository.typeorm'
+import { ArticleEntity, ArticlesHaveTagsEntity, TagEntity } from './articles/articles.repository.typeorm'
 import { AuthorEntity, UserFollows } from './authors/authors.entity'
 import { CommentEntity } from './comments/comments.repository'
 import { getEnvs } from './environment'
@@ -13,8 +10,7 @@ import { getEnvs } from './environment'
 export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
   const { DATABASE_URL } = getEnvs()
 
-  const url =
-    DATABASE_URL ?? 'mysql://realworld:realworld@localhost:3306/realworld'
+  const url = DATABASE_URL ?? 'mysql://realworld:realworld@localhost:3306/realworld'
 
   const pscaleDatabase = url.includes('pscale')
 
@@ -49,9 +45,8 @@ export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
 
 export function createUnitTestDataSource() {
   const datasource = createDataSourceInstance()
-  require('assert')(
-    datasource.options.type === 'mysql' &&
-      datasource.options.url?.includes('localhost'),
+  assert(
+    datasource.options.type === 'mysql' && datasource.options.url?.includes('localhost'),
     'Unit test datasource must be a local mysql database',
   )
   return datasource

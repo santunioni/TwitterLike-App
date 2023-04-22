@@ -7,14 +7,7 @@ import { GlobalModule } from '../global/global.module'
 import { ChecksController } from './checks.controller'
 
 @Module({
-  imports: [
-    ArticlesModule,
-    AuthorsModule,
-    CommentsModule,
-    AccountsModule,
-    ArticlesModule,
-    GlobalModule,
-  ],
+  imports: [ArticlesModule, AuthorsModule, CommentsModule, AccountsModule, ArticlesModule, GlobalModule],
   controllers: [ChecksController],
   providers: [],
 })

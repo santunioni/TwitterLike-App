@@ -20,11 +20,7 @@ export type Comment = {
 export class CommentsRepository {
   constructor(private readonly entityManager: EntityManager) {}
 
-  async commentArticle(
-    me: { id: number },
-    article: { id: number },
-    body: string,
-  ) {
+  async commentArticle(me: { id: number }, article: { id: number }, body: string) {
     return await this.entityManager
       .create(CommentEntity, {
         body,
@@ -50,11 +46,7 @@ export class CommentsRepository {
       .getMany()
   }
 
-  async deleteCommentFromArticle(
-    id: number,
-    article: { id: number },
-    me: { id: number },
-  ) {
+  async deleteCommentFromArticle(id: number, article: { id: number }, me: { id: number }) {
     const result = await this.entityManager
       .createQueryBuilder(CommentEntity, 'comment')
       .delete()

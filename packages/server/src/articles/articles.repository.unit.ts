@@ -2,10 +2,7 @@ import { DataSource } from 'typeorm'
 import { createUnitTestDataSource } from '../datasource'
 import { makeRandomArticle } from './articles.mock'
 import { ArticlesRepository, TagsRepository } from './articles.repository'
-import {
-  TypeORMArticlesRepository,
-  TypeORMTagsRepository,
-} from './articles.repository.typeorm'
+import { TypeORMArticlesRepository, TypeORMTagsRepository } from './articles.repository.typeorm'
 
 let dataSource: DataSource
 let tagsRepository: TagsRepository
@@ -37,10 +34,7 @@ describe('ArticlesRepository', () => {
     })
 
     // Act
-    const createdArticle = await articlesRepository.createArticle(
-      { title, slug, body, description },
-      { id: authorId },
-    )
+    const createdArticle = await articlesRepository.createArticle({ title, slug, body, description }, { id: authorId })
     const queriedArticle = await articlesRepository.getArticles({
       filterBySlug: slug,
       owner: { id: authorId },
@@ -68,17 +62,10 @@ describe('ArticlesRepository', () => {
     const { title, slug, body, description } = makeRandomArticle({
       title: `How to train your dragon? ${testRandomNumber}`,
     })
-    await articlesRepository.createArticle(
-      { title, slug, body, description },
-      { id: authorId },
-    )
+    await articlesRepository.createArticle({ title, slug, body, description }, { id: authorId })
 
     // Act
-    const updatedArticle = await articlesRepository.updateArticle(
-      slug,
-      { id: authorId },
-      { body: 'Blabla' },
-    )
+    const updatedArticle = await articlesRepository.updateArticle(slug, { id: authorId }, { body: 'Blabla' })
     const queriedArticle = await articlesRepository.getArticles({
       filterBySlug: slug,
       owner: { id: authorId },
@@ -104,13 +91,8 @@ describe('ArticlesRepository', () => {
 
 describe('TagsRepository', () => {
   it('should set article tags', async () => {
-    const tags = await tagsRepository.setArticleTags({ id: testRandomNumber }, [
-      'dragons',
-      'friendship',
-    ])
+    const tags = await tagsRepository.setArticleTags({ id: testRandomNumber }, ['dragons', 'friendship'])
     expect(tags).toEqual(['dragons', 'friendship'])
-    expect(
-      await tagsRepository.getArticleTags({ id: testRandomNumber }),
-    ).toEqual(['dragons', 'friendship'])
+    expect(await tagsRepository.getArticleTags({ id: testRandomNumber })).toEqual(['dragons', 'friendship'])
   })
 })

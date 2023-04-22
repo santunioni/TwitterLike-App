@@ -47,7 +47,7 @@ resource "aws_lambda_function" "realworld_api_function" {
   filename         = "${path.module}/lambda.zip"
   source_code_hash = filebase64sha256("${path.module}/lambda.zip")
   handler          = "index.handler"
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs18.x"
   timeout          = 60 * 5
   memory_size      = 516
 }

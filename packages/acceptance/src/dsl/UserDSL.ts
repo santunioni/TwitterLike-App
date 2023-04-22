@@ -48,17 +48,8 @@ export class UserDSL {
     await this.driver.deleteArticle(slug || this.slug)
   }
 
-  async editTheArticle(slug?: string) {
-    await this.driver.editArticle(slug || this.slug, {
-      body: makeRandomArticle().body,
-    })
-  }
-
   async commentOnArticle(slug?: string, comment?: string) {
-    await this.driver.commentOnArticle(
-      slug || this.slug,
-      comment || 'I liked that article!',
-    )
+    await this.driver.commentOnArticle(slug || this.slug, comment || 'I liked that article!')
   }
 
   async publishAnArticle(article: PartialArticle = {}) {

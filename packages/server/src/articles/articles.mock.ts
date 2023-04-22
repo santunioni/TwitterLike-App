@@ -11,10 +11,6 @@ export function makeRandomArticle(article: Partial<Article & Tagged> = {}) {
     slug: slugify(title),
     description: article?.description || lorem.generateSentences(2),
     body: article?.body || lorem.generateParagraphs(1),
-    tags: [
-      ...new Set(
-        article?.tags || lorem.generateWords(4).toLowerCase().split(' '),
-      ),
-    ],
+    tags: [...new Set(article?.tags || lorem.generateWords(4).toLowerCase().split(' '))],
   }
 }

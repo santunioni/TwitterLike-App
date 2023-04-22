@@ -1,24 +1,8 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common'
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
-import {
-  AuthIsOptional,
-  GetUser,
-  JWTAuthGuard,
-  RequireUser,
-  User,
-} from '../nest/jwt.guard'
+import { AuthIsOptional, GetUser, JWTAuthGuard, RequireUser, User } from '../nest/jwt.guard'
 import { buildUrlToPath } from '../nest/url'
 import { ZodBody } from '../nest/validation.utils'
 import { TRPC } from '../trpc/app'
@@ -70,14 +54,8 @@ export class AuthorsController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async create(
-    @RequireUser() user: User,
-    @ZodBody(CreateProfileBody) body: CreateProfileBody,
-  ) {
-    const me = await this.authorsService.createUserAuthorProfile(
-      user,
-      body.profile,
-    )
+  async create(@RequireUser() user: User, @ZodBody(CreateProfileBody) body: CreateProfileBody) {
+    const me = await this.authorsService.createUserAuthorProfile(user, body.profile)
     return createAuthorProfileBody(me)
   }
 
@@ -86,23 +64,14 @@ export class AuthorsController {
   })
   @HttpCode(HttpStatus.OK)
   @Patch()
-  async update(
-    @RequireUser() user: User,
-    @ZodBody(UpdateProfileBody) body: UpdateProfileBody,
-  ) {
-    const me = await this.authorsService.updateUserAuthorProfile(
-      user,
-      body.profile,
-    )
+  async update(@RequireUser() user: User, @ZodBody(UpdateProfileBody) body: UpdateProfileBody) {
+    const me = await this.authorsService.updateUserAuthorProfile(user, body.profile)
     return createAuthorProfileBody(me)
   }
 
   @HttpCode(HttpStatus.CREATED)
   @Post(':username/follow')
-  async followProfile(
-    @RequireUser() user: User,
-    @Param('username') username: string,
-  ) {
+  async followProfile(@RequireUser() user: User, @Param('username') username: string) {
     const me = await this.authorsService.getUserAuthorProfile(user)
     const profile = await this.authorsService.getAuthorByUsername(username)
     await me.follow(profile)
@@ -111,10 +80,7 @@ export class AuthorsController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':username/follow')
-  async unfollowProfile(
-    @RequireUser() user: User,
-    @Param('username') username: string,
-  ) {
+  async unfollowProfile(@RequireUser() user: User, @Param('username') username: string) {
     const me = await this.authorsService.getUserAuthorProfile(user)
     const profile = await this.authorsService.getAuthorByUsername(username)
     await me.unfollow(profile)
@@ -124,10 +90,7 @@ export class AuthorsController {
   @HttpCode(HttpStatus.OK)
   @AuthIsOptional()
   @Get(':username')
-  async getProfile(
-    @GetUser() user: User | null,
-    @Param('username') username: string,
-  ) {
+  async getProfile(@GetUser() user: User | null, @Param('username') username: string) {
     const author = await this.authorsService.getAuthorByUsername(username)
     let following: boolean | undefined = undefined
     if (user) {
@@ -160,36 +123,25 @@ export function createAuthorDTO(author: Profile, following?: boolean) {
   } as const
 }
 
-export function createAuthorsTrpcRouter(
-  controller: AuthorsController,
-  trpc: TRPC,
-) {
+export function createAuthorsTrpcRouter(controller: AuthorsController, trpc: TRPC) {
   return trpc.router({
     profiles: trpc.router({
-      getCurrent: trpc.protectedProcedure.query(({ ctx }) =>
-        controller.getCurrent(ctx.user),
-      ),
+      getCurrent: trpc.protectedProcedure.query(({ ctx }) => controller.getCurrent(ctx.user)),
       create: trpc.protectedProcedure
         .input(CreateProfileBody)
         .mutation(({ ctx, input }) => controller.create(ctx.user, input)),
       get: trpc.protectedProcedure
         .input(z.object({ username }))
-        .query(({ ctx, input }) =>
-          controller.getProfile(ctx.user, input.username),
-        ),
+        .query(({ ctx, input }) => controller.getProfile(ctx.user, input.username)),
       update: trpc.protectedProcedure
         .input(UpdateProfileBody)
         .mutation(({ ctx, input }) => controller.update(ctx.user, input)),
       follow: trpc.protectedProcedure
         .input(z.object({ username }))
-        .mutation(({ ctx, input }) =>
-          controller.followProfile(ctx.user, input.username),
-        ),
+        .mutation(({ ctx, input }) => controller.followProfile(ctx.user, input.username)),
       unfollow: trpc.protectedProcedure
         .input(z.object({ username }))
-        .mutation(({ ctx, input }) =>
-          controller.unfollowProfile(ctx.user, input.username),
-        ),
+        .mutation(({ ctx, input }) => controller.unfollowProfile(ctx.user, input.username)),
     }),
   })
 }

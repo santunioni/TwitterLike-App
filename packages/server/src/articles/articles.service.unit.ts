@@ -3,10 +3,7 @@ import { AuthorsService } from '../authors/authors.service'
 import { createUnitTestDataSource } from '../datasource'
 import { makeRandomArticle } from './articles.mock'
 import { Article, Sluged, Tagged } from './articles.models'
-import {
-  TypeORMArticlesRepository,
-  TypeORMTagsRepository,
-} from './articles.repository.typeorm'
+import { TypeORMArticlesRepository, TypeORMTagsRepository } from './articles.repository.typeorm'
 import { ArticleNotFound, ArticlesService } from './articles.service'
 
 let dataSource: DataSource
@@ -69,9 +66,7 @@ describe('ArticlesView', () => {
     await cms.createArticle(exampleArticle)
 
     // Act
-    const article = await service
-      .getView(author)
-      .getArticle(exampleArticle.slug)
+    const article = await service.getView(author).getArticle(exampleArticle.slug)
 
     // Assert
     expect(article).toMatchObject({
@@ -86,13 +81,11 @@ describe('ArticlesView', () => {
     await cms.createArticle(exampleArticle)
 
     // Act - Assert
-    await expect(
-      service.getView().getArticle(exampleArticle.slug),
-    ).rejects.toThrow(ArticleNotFound)
+    await expect(service.getView().getArticle(exampleArticle.slug)).rejects.toThrow(ArticleNotFound)
 
-    await expect(
-      service.getView({ id: author.id + 1 }).getArticle(exampleArticle.slug),
-    ).rejects.toThrow(ArticleNotFound)
+    await expect(service.getView({ id: author.id + 1 }).getArticle(exampleArticle.slug)).rejects.toThrow(
+      ArticleNotFound,
+    )
   })
 
   it('should return article by tag', async () => {
@@ -102,9 +95,7 @@ describe('ArticlesView', () => {
     await cms.createArticle(example)
 
     // Act
-    const articles = await service
-      .getView(author)
-      .getArticlesByFilters({ tags: ['programming'] })
+    const articles = await service.getView(author).getArticlesByFilters({ tags: ['programming'] })
 
     // Assert
     expect(articles).toContainEqual(
@@ -118,9 +109,7 @@ describe('ArticlesView', () => {
         }),
       }),
     )
-    articles.forEach((article) =>
-      expect(article.tags).toContainEqual('programming'),
-    )
+    articles.forEach(article => expect(article.tags).toContainEqual('programming'))
   })
 
   it('should return articles sorted by creation date', async () => {
@@ -131,15 +120,13 @@ describe('ArticlesView', () => {
       cms.createArticle(makeRandomArticle()),
       cms.createArticle(makeRandomArticle()),
     ])
-    await Promise.all(
-      createdArticles.map((article) => cms.publishArticle(article.slug)),
-    )
+    await Promise.all(createdArticles.map(article => cms.publishArticle(article.slug)))
 
     // Act
     const articles = await service.getView().getFeed()
 
     // Assert
-    const dates = articles.map((a) => a.createdAt)
+    const dates = articles.map(a => a.createdAt)
     expect(dates).toEqual(dates.sort((a, b) => b.getTime() - a.getTime()))
     expect(dates.length).toBeGreaterThanOrEqual(createdArticles.length)
   })
@@ -155,9 +142,7 @@ describe('ArticlesView', () => {
     const createdArticle = createdArticles[0]
 
     // Act
-    const article = await service
-      .getView(author)
-      .getArticle(createdArticle.slug)
+    const article = await service.getView(author).getArticle(createdArticle.slug)
 
     // Assert
     expect(article).toMatchObject({

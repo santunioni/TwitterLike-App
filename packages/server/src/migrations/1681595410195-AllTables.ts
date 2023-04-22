@@ -29,29 +29,17 @@ export class AllTables1681595410195 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE \`comments\``)
-    await queryRunner.query(
-      `DROP INDEX \`IDX_536438d8f0f121fd561a0929a5\` ON \`articles_have_tags\``,
-    )
+    await queryRunner.query(`DROP INDEX \`IDX_536438d8f0f121fd561a0929a5\` ON \`articles_have_tags\``)
     await queryRunner.query(`DROP TABLE \`articles_have_tags\``)
-    await queryRunner.query(
-      `DROP INDEX \`IDX_d90243459a697eadb8ad56e909\` ON \`tags\``,
-    )
+    await queryRunner.query(`DROP INDEX \`IDX_d90243459a697eadb8ad56e909\` ON \`tags\``)
     await queryRunner.query(`DROP TABLE \`tags\``)
-    await queryRunner.query(
-      `DROP INDEX \`IDX_1123ff6815c5b8fec0ba9fec37\` ON \`articles\``,
-    )
+    await queryRunner.query(`DROP INDEX \`IDX_1123ff6815c5b8fec0ba9fec37\` ON \`articles\``)
     await queryRunner.query(`DROP TABLE \`articles\``)
-    await queryRunner.query(
-      `DROP INDEX \`IDX_23035240e9706a374d44cc7d43\` ON \`user_follows\``,
-    )
+    await queryRunner.query(`DROP INDEX \`IDX_23035240e9706a374d44cc7d43\` ON \`user_follows\``)
     await queryRunner.query(`DROP TABLE \`user_follows\``)
-    await queryRunner.query(
-      `DROP INDEX \`IDX_0abaae55952d5f8f9f6bfd8737\` ON \`authors\``,
-    )
+    await queryRunner.query(`DROP INDEX \`IDX_0abaae55952d5f8f9f6bfd8737\` ON \`authors\``)
     await queryRunner.query(`DROP TABLE \`authors\``)
-    await queryRunner.query(
-      `DROP INDEX \`IDX_ee66de6cdc53993296d1ceb8aa\` ON \`accounts\``,
-    )
+    await queryRunner.query(`DROP INDEX \`IDX_ee66de6cdc53993296d1ceb8aa\` ON \`accounts\``)
     await queryRunner.query(`DROP TABLE \`accounts\``)
   }
 }

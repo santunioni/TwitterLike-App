@@ -40,11 +40,7 @@ export interface ArticlesRepository {
     owner: { id: number },
   ): Promise<FullArticle>
 
-  updateArticle(
-    slug: string,
-    owner: { id: number },
-    snapshot: Partial<Article & Tagged>,
-  ): Promise<FullArticle>
+  updateArticle(slug: string, owner: { id: number }, snapshot: Partial<Article & Tagged>): Promise<FullArticle>
 
   deleteArticle(slug: string, owner: { id: number }): Promise<void>
 
