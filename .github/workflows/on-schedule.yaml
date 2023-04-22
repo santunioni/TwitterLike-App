@@ -36,5 +36,6 @@ jobs:
       matrix:
         environment: ${{ fromJson(needs.list.outputs.environments) }}
     uses: ./.github/workflows/clear.yaml
+    secrets: inherit
     with:
       environment: ${{ matrix.environment }}
