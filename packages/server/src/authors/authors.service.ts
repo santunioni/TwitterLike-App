@@ -26,7 +26,7 @@ export class AuthorsService {
       .select()
       .where({ userId: profile.id })
       .getMany()
-    return following.map((uf) => ({
+    return following.map(uf => ({
       id: uf.followsId,
     }))
   }
@@ -50,7 +50,7 @@ export class AuthorsService {
       accountId: user.id,
     })
       .save()
-      .catch((err) => {
+      .catch(() => {
         throw new AuthorAlreadyExists(fields.username)
       })
   }

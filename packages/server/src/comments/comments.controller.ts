@@ -89,7 +89,7 @@ export class CommentsController {
     )
     return {
       comments: await Promise.all(
-        comments.map(async (comment) => {
+        comments.map(async comment => {
           const author = await this.authorsService.getAuthorById(
             comment.authorId,
           )

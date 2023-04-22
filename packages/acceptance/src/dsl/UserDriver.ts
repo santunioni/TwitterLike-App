@@ -23,7 +23,6 @@ export interface UserDriver {
   publishArticle(slug: string): Promise<void>
   deleteArticle(slug: string): Promise<void>
   unpublishArticle(slug: string): Promise<void>
-  editArticle(slug: string, editions: PartialArticle): Promise<string>
   writeArticle(article: Article): Promise<string>
   commentOnArticle(slug: string, comment: string): Promise<void>
   shouldFindArticleBy(filters: ArticleSearchFields, slug: string): Promise<void>

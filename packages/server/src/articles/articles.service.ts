@@ -85,7 +85,7 @@ export class ArticleView {
     )
 
     return Promise.all(
-      articles.map((article) => this.addTagsAndAuthorToArticle(article)),
+      articles.map(article => this.addTagsAndAuthorToArticle(article)),
     )
   }
 
@@ -106,7 +106,7 @@ export class ArticleView {
         pagination,
       )
       return await Promise.all(
-        articles.map((article) => this.addTagsAndAuthorToArticle(article)),
+        articles.map(article => this.addTagsAndAuthorToArticle(article)),
       )
     } catch (error) {
       if (error instanceof AuthorNotFound) {

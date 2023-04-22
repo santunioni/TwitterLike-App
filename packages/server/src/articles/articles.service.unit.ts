@@ -118,7 +118,7 @@ describe('ArticlesView', () => {
         }),
       }),
     )
-    articles.forEach((article) =>
+    articles.forEach(article =>
       expect(article.tags).toContainEqual('programming'),
     )
   })
@@ -132,14 +132,14 @@ describe('ArticlesView', () => {
       cms.createArticle(makeRandomArticle()),
     ])
     await Promise.all(
-      createdArticles.map((article) => cms.publishArticle(article.slug)),
+      createdArticles.map(article => cms.publishArticle(article.slug)),
     )
 
     // Act
     const articles = await service.getView().getFeed()
 
     // Assert
-    const dates = articles.map((a) => a.createdAt)
+    const dates = articles.map(a => a.createdAt)
     expect(dates).toEqual(dates.sort((a, b) => b.getTime() - a.getTime()))
     expect(dates.length).toBeGreaterThanOrEqual(createdArticles.length)
   })

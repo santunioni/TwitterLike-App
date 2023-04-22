@@ -9,7 +9,7 @@ export function buildUrlToPath(
   path = path.replace(/^\//, '').replace(/\/$/, '')
   const url = new URL(`${BASE_URL}/api/${path}`)
 
-  paramsArray.forEach((params) => {
+  paramsArray.forEach(params => {
     for (const [key, value] of Object.entries(params)) {
       url.searchParams.set(key, String(value))
     }

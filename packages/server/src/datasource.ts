@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 import { AccountEntity } from './accounts/accounts.entity'
@@ -49,7 +50,7 @@ export function createDataSourceInstance(opts?: Partial<DataSourceOptions>) {
 
 export function createUnitTestDataSource() {
   const datasource = createDataSourceInstance()
-  require('assert')(
+  assert(
     datasource.options.type === 'mysql' &&
       datasource.options.url?.includes('localhost'),
     'Unit test datasource must be a local mysql database',

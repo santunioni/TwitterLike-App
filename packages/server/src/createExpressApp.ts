@@ -45,7 +45,7 @@ export async function createExpressApp() {
         nest.get(ArticlesController),
         nest.get(AuthorsController),
       ),
-      onError: (err) => delete err.error.stack, // Don't expose internal failures to the World
+      onError: err => delete err.error.stack, // Don't expose internal failures to the World
     }),
   )
 

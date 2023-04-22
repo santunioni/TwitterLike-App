@@ -51,10 +51,7 @@ const body = z
   )
 
 const tags = z
-  .union([
-    z.array(z.string()),
-    z.string().transform((tags) => tags?.split(',')),
-  ])
+  .union([z.array(z.string()), z.string().transform(tags => tags?.split(','))])
   .describe('The article tags. Example: ["dragons", "training"]')
 
 const article = z.object({ title, description, body, tags })
@@ -80,7 +77,7 @@ export const ArticleFiltersDTO = z
       .optional()
       .describe('Whether the article is favorited by you'),
   })
-  .transform((o) => {
+  .transform(o => {
     return {
       ...o,
       toParams: () => ({
@@ -114,7 +111,7 @@ export class ArticlesController {
     )
     const articles = await view.getFeed(pagination)
     return {
-      articles: articles.map((article) =>
+      articles: articles.map(article =>
         createArticleDTO(article, article.author),
       ),
       links:
@@ -142,7 +139,7 @@ export class ArticlesController {
     )
     const articles = await view.getArticlesByFilters(filters, pagination)
     return {
-      articles: articles.map((article) =>
+      articles: articles.map(article =>
         createArticleDTO(article, article.author),
       ),
       links:
@@ -168,18 +165,6 @@ export class ArticlesController {
     return {
       article: createArticleDTO(article, article.author),
     }
-  }
-
-  @HttpCode(HttpStatus.CREATED)
-  @Post(':slug/favorite')
-  favoriteArticle(@RequireUser() user: User, @Param('slug') slug: string) {
-    return undefined
-  }
-
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':slug/favorite')
-  unfavoriteArticle(@RequireUser() user: User, @Param('slug') slug: string) {
-    return undefined
   }
 
   @HttpCode(HttpStatus.CREATED)

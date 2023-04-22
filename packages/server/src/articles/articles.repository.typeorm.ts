@@ -36,17 +36,17 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
 
     if (options.filterByAuthors) {
       qb.andWhere({
-        authorId: In(options.filterByAuthors.map((author) => author.id)),
+        authorId: In(options.filterByAuthors.map(author => author.id)),
       })
     }
 
     if (options.filterByTags) {
-      qb.andWhere((qb) => {
+      qb.andWhere(qb => {
         return `${qb.alias}.id IN ${qb
           .subQuery()
           .select('aht.article_id')
           .from(ArticlesHaveTagsEntity, 'aht')
-          .where((qb) => {
+          .where(qb => {
             return `aht.tag_id IN ${qb
               .subQuery()
               .select('t.id')
@@ -73,7 +73,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
 
     const queryResult = await qb.getMany()
 
-    return queryResult.map((article) => this.createArticleResponse(article))
+    return queryResult.map(article => this.createArticleResponse(article))
   }
 
   async createArticle(articleData: Article & Sluged, owner: { id: number }) {
@@ -121,7 +121,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
     return this.getArticles(
       { filterBySlug: newSlug ?? slug, owner },
       { take: 1, skip: 0 },
-    ).then((articles) => articles[0])
+    ).then(articles => articles[0])
   }
 
   async deleteArticle(slug: string, owner: { id: number }) {
@@ -195,7 +195,7 @@ export class TypeORMTagsRepository implements TagsRepository {
         createTags: (tags: string[]) =>
           this.entityManager.query(
             `INSERT IGNORE INTO tags (name) VALUES ${tags
-              .map((_) => '(?)')
+              .map(() => '(?)')
               .join(', ')};`,
             tags,
           ),
@@ -269,7 +269,7 @@ export class ArticleEntity extends BaseEntity {
   updatedAt!: Date
 
   @Column()
-  published: boolean = false
+  published = false
 
   @Column({ type: 'integer', nullable: false })
   authorId!: number
@@ -297,8 +297,8 @@ export class ArticlesHaveTagsEntity extends BaseEntity {
   articleId!: number
 }
 
-function removeUndefinedValues<T extends Object>(obj: T): T {
-  Object.keys(obj).forEach((key) => {
+function removeUndefinedValues<T extends object>(obj: T): T {
+  Object.keys(obj).forEach(key => {
     if (obj[key] === undefined) {
       delete obj[key]
     }

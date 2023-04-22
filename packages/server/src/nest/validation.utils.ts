@@ -6,7 +6,7 @@ export function createZodTransformer<ZT extends ZodType>(
   schema: ZT,
 ): PipeTransform<any, ZT['_output']> {
   return {
-    transform: (value, _) => {
+    transform: value => {
       try {
         return schema.parse(value) as ZT['_output']
       } catch (e) {

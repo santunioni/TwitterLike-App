@@ -3,7 +3,6 @@ import {
   Article,
   ArticleSearchFields,
   createCredentials,
-  PartialArticle,
   UserDriver,
 } from './UserDriver'
 
@@ -11,12 +10,12 @@ export class UserRestDriver implements UserDriver {
   private axios = new Axios({
     baseURL: process.env.API_URL || 'http://localhost:3000/api',
     responseType: 'json',
-    transformRequest: (data) => (data ? JSON.stringify(data) : data),
-    transformResponse: (data) => (data ? JSON.parse(data) : data),
+    transformRequest: data => (data ? JSON.stringify(data) : data),
+    transformResponse: data => (data ? JSON.parse(data) : data),
     headers: {
       'Content-Type': 'application/json',
     },
-    validateStatus: (status) => status < 500,
+    validateStatus: status => status < 500,
   })
 
   async createAccount(username: string) {
@@ -86,16 +85,12 @@ export class UserRestDriver implements UserDriver {
 
   async shouldFindArticleBy(filters: ArticleSearchFields, slug: string) {
     const articles = await this.findArticles(filters)
-    expect(articles.map((v) => v.slug)).toContainEqual(slug)
+    expect(articles.map(v => v.slug)).toContainEqual(slug)
   }
 
   async shouldNotFindArticleBy(filters: ArticleSearchFields, slug: string) {
     const articles = await this.findArticles(filters)
-    expect(articles.map((v) => v.slug)).not.toContainEqual(slug)
-  }
-
-  async editArticle(slug: string, editions: PartialArticle) {
-    return slug
+    expect(articles.map(v => v.slug)).not.toContainEqual(slug)
   }
 
   async publishArticle(slug: string) {
@@ -124,12 +119,12 @@ export class UserRestDriver implements UserDriver {
 
   async shouldSeeTheArticleInTheFeed(slug: string) {
     const feed = await this.getFeed()
-    expect(feed.map((v) => v.slug)).toContainEqual(slug)
+    expect(feed.map(v => v.slug)).toContainEqual(slug)
   }
 
   async shouldNotSeeTheArticleInTheFeed(slug: string) {
     const feed = await this.getFeed()
-    expect(feed.map((v) => v.slug)).not.toContainEqual(slug)
+    expect(feed.map(v => v.slug)).not.toContainEqual(slug)
   }
 
   private async getArticle(slug: string) {
@@ -151,7 +146,7 @@ export class UserRestDriver implements UserDriver {
   async shouldSeeCommentFrom(slug: string, username: string) {
     const response = await this.axios.get(`articles/${slug}/comments`)
     APISpecValidations.validateGetCommentsResponse(response)
-    expect(response.data.comments.map((v) => v.author.username)).toContainEqual(
+    expect(response.data.comments.map(v => v.author.username)).toContainEqual(
       username,
     )
   }

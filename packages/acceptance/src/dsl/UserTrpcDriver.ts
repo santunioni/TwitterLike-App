@@ -6,12 +6,7 @@ import axios, {
   AxiosResponseHeaders,
   RawAxiosResponseHeaders,
 } from 'axios'
-import {
-  Article,
-  ArticleSearchFields,
-  PartialArticle,
-  UserDriver,
-} from './UserDriver'
+import { Article, ArticleSearchFields, UserDriver } from './UserDriver'
 import { UserRestDriver } from './UserRestDriver'
 
 function convertAxiosHeadersToTrpcHeaders(
@@ -22,12 +17,12 @@ function convertAxiosHeadersToTrpcHeaders(
     return acc
   }, new Map<string, string>())
   return {
-    get: (key) => trpcMap.get(key) ?? null,
+    get: key => trpcMap.get(key) ?? null,
     set: (key, value) => trpcMap.set(key, value),
     append: (key, value) => trpcMap.set(key, value),
-    has: (key) => trpcMap.has(key),
-    delete: (key) => trpcMap.delete(key),
-    forEach: (callback) => trpcMap.forEach(callback),
+    has: key => trpcMap.has(key),
+    delete: key => trpcMap.delete(key),
+    forEach: callback => trpcMap.forEach(callback),
   }
 }
 
@@ -112,19 +107,14 @@ export class UserTrpcDriver implements UserDriver {
     const articles = await this.trpc.articles.getMany.query({
       filters,
     })
-    expect(articles.articles.map((v) => v.slug)).toContainEqual(slug)
+    expect(articles.articles.map(v => v.slug)).toContainEqual(slug)
   }
 
   async shouldNotFindArticleBy(filters: ArticleSearchFields, slug: string) {
     const articles = await this.trpc.articles.getMany.query({
       filters,
     })
-    expect(articles.articles.map((v) => v.slug)).not.toContainEqual(slug)
-  }
-
-  async editArticle(slug: string, changes: PartialArticle) {
-    const result = await this.trpc.articles.update.mutate({ slug, changes })
-    return result.article.slug
+    expect(articles.articles.map(v => v.slug)).not.toContainEqual(slug)
   }
 
   async publishArticle(slug: string) {
@@ -141,12 +131,12 @@ export class UserTrpcDriver implements UserDriver {
 
   async shouldSeeTheArticleInTheFeed(slug: string) {
     const feed = await this.trpc.articles.getFeed.query({})
-    expect(feed.articles.map((v) => v.slug)).toContainEqual(slug)
+    expect(feed.articles.map(v => v.slug)).toContainEqual(slug)
   }
 
   async shouldNotSeeTheArticleInTheFeed(slug: string) {
     const feed = await this.trpc.articles.getFeed.query({})
-    expect(feed.articles.map((v) => v.slug)).not.toContainEqual(slug)
+    expect(feed.articles.map(v => v.slug)).not.toContainEqual(slug)
   }
 
   async shouldFindTheArticle(slug: string) {
@@ -166,7 +156,7 @@ export class UserTrpcDriver implements UserDriver {
     const response = await this.trpc.comments.getMany.query({
       slug,
     })
-    expect(response.comments.map((v) => v.author.username)).toContainEqual(
+    expect(response.comments.map(v => v.author.username)).toContainEqual(
       username,
     )
   }

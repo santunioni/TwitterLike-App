@@ -17,7 +17,9 @@
     "migration:revert": "npm run typeorm migration:revert",
     "migration:show": "npm run typeorm migration:show",
     "migration:check": "npm run typeorm migration:generate migrations -- --check",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
     "@nestjs/common": "^9.3.12",
