@@ -293,24 +293,6 @@ export function createArticlesTrpcRouter(
           }),
         )
         .query(({ input, ctx }) => controller.getArticle(ctx.user, input.slug)),
-      favorite: trpc.protectedProcedure
-        .input(
-          z.object({
-            slug,
-          }),
-        )
-        .mutation(({ input, ctx }) =>
-          controller.favoriteArticle(ctx.user, input.slug),
-        ),
-      unfavorite: trpc.protectedProcedure
-        .input(
-          z.object({
-            slug,
-          }),
-        )
-        .mutation(({ input, ctx }) =>
-          controller.unfavoriteArticle(ctx.user, input.slug),
-        ),
       create: trpc.protectedProcedure
         .input(CreateArticleDTO)
         .mutation(({ input, ctx }) =>
