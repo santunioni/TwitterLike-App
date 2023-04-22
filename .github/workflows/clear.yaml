@@ -59,7 +59,7 @@ jobs:
         run: |
           . functions.sh
 
-          BRANCH_EXISTS=$(pscale branch list $DB_NAME --org $ORG_NAME | jq -r '.[] | select(.name == "${{ inputs.environment }}") | .name')
+          BRANCH_EXISTS=$(pscale branch list $DB_NAME --org $ORG_NAME --format json | jq -r '.[] | select(.name == "${{ inputs.environment }}") | .name')
           if [ -z "$BRANCH_EXISTS" ]; then
             echo "Branch ${{ inputs.environment }} does not exist"
             exit 0
