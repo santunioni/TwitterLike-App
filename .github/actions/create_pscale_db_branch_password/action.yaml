@@ -6,11 +6,9 @@ inputs:
   db_name:
     required: true
     description: The Database Name
-    default: realworld-app
   org_name:
     required: true
     description: The Database Organization Name
-    default: santunioni
   branch_name:
     required: true
     description: The Database Branch Name
@@ -45,24 +43,21 @@ runs:
       run: |
         . functions.sh    
 
-        BASE_PATH="/pscale/$ORG_NAME/$DB_NAME/$BRANCH_NAME/$PASSWORD_NAME"
-        ID_PATH="$BASE_PATH/id"
-        URL_PATH="$BASE_PATH/url"
+        URL_PATH="/pscale/$ORG_NAME/$DB_NAME/$BRANCH_NAME/$PASSWORD_NAME"
+        DATABASE_URL=$(aws ssm get-parameters-by-path --path "$URL_PATH" --with-decryption --output json | jq -r ".Parameters[] | select(.Name == \"$URL_PATH\") | .Value")
+        FOUND=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.name == \"$PASSWORD_NAME\") | .id")
 
-        ID=$(aws ssm get-parameters-by-path --path "$BASE_PATH" --output json | jq -r ".Parameters[] | select(.Name == \"$ID_PATH\") | .Value")
-        FOUND_ID=$(pscale password list "$DB_NAME" "$BRANCH_NAME" --org "$ORG_NAME" --format json | jq -r ".[] | select(.id == \"$ID\") | .id")
-
-        if [ ! -n "$FOUND_ID" ]; then
-          raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_NAME" --org "$ORG_NAME" --format json)
-          ID=$(echo "$raw_db_url" |  jq -r ".id")
-          URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/$DB_NAME\"")
-
-          aws ssm put-parameter --name "$ID_PATH" --value "$ID" --type String --overwrite
-          aws ssm put-parameter --name "$URL_PATH" --value "$URL" --type SecureString --overwrite
-        else
-          URL=$(aws ssm get-parameter --name "$URL_PATH" --with-decryption --output json | jq -r ".Parameter.Value")
+        if [ -n "$DATABASE_URL" ] && [ -n "$FOUND" ]; then
+          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
+          exit 0
         fi
 
-        echo "ID_PATH=$ID_PATH" >> $GITHUB_OUTPUT
-        echo "URL_PATH=$URL_PATH" >> $GITHUB_OUTPUT
-        echo "DATABASE_URL=$URL" >> $GITHUB_OUTPUT
+        if [ ! -n "$DATABASE_URL" ] && [ -n "$FOUND" ]; then
+          pscale password delete "$DB_NAME" "$BRANCH_NAME" "$FOUND" --org "$ORG_NAME" --force
+        fi
+
+        raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_NAME" --org "$ORG_NAME" --format json)
+        DATABASE_URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/$DB_NAME\"")
+        aws ssm put-parameter --name "$URL_PATH" --value "$DATABASE_URL" --type SecureString --overwrite
+
+        echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT

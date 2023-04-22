@@ -10,6 +10,18 @@ variable "STAGE_NAME" {
   default     = "v1"
 }
 
+variable "PSCALE_DB_NAME" {
+  description = "The PlanetScale database name"
+  type        = string
+  default     = "realworld-app"
+}
+
+variable "PSCALE_ORG_NAME" {
+  description = "The PlanetScale organization name"
+  type        = string
+  default     = "santunioni"
+}
+
 data "external" "git" {
   program = [
     "git",
