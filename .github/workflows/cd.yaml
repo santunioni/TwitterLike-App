@@ -51,7 +51,7 @@ jobs:
           path: packages/server/terraform
 
       - id: terraform
-        name: Deploy ${{ steps.environment.outputs.name }}
+        name: Deploy Production
         working-directory: packages/server/terraform
         run: |
           terraform init -reconfigure -backend-config="key=realworld-app/production/lambda.tfstate"

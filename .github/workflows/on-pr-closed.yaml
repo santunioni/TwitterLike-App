@@ -1,0 +1,11 @@
+name: On PR Closed
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  clear-ephemeral:
+    uses: ./.github/workflows/clear.yaml
+    with:
+      environment: ephemeral-pr-${{ github.event.pull_request.number }}

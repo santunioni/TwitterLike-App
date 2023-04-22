@@ -4,6 +4,10 @@ run-name: Integration
 
 on:
   workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 env:
   DB_NAME: realworld-app
@@ -119,15 +123,12 @@ jobs:
 
       - uses: ./.github/actions/credentials
 
-      - id: environment
-        uses: ./.github/actions/get_branch_environment_name
-
       - name: Create DB Branch
         uses: ./.github/actions/create_pscale_db_branch
         with:
           db_name: ${{ env.DB_NAME }}
           org_name: ${{ env.ORG_NAME }}
-          branch_name: ${{ steps.environment.outputs.name }}
+          branch_name: ${{ inputs.environment }}
 
       - id: dburl
         name: Create DB Branch Password
@@ -135,7 +136,7 @@ jobs:
         with:
           db_name: ${{ env.DB_NAME }}
           org_name: ${{ env.ORG_NAME }}
-          branch_name: ${{ steps.environment.outputs.name }}
+          branch_name: ${{ inputs.environment }}
 
       - uses: actions/setup-node@v3
         with:
@@ -164,7 +165,7 @@ jobs:
         name: Build Lambda
 
       - id: terraform
-        name: Deploy ${{ steps.environment.outputs.name }}
+        name: Deploy ${{ inputs.environment }}
         working-directory: packages/server/terraform
         run: |
           terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
@@ -173,9 +174,9 @@ jobs:
           echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
-          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+          TF_VAR_ENVIRONMENT: ${{ inputs.environment }}
 
-      - name: Wait ${{ steps.environment.outputs.name }}
+      - name: Wait ${{ inputs.environment }}
         run: |
           ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/checks/readiness" 200
           ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/articles" 200

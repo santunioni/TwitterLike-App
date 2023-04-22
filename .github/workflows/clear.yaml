@@ -3,18 +3,21 @@ name: Clear Ephemeral Environments
 run-name: Clear
 
 on:
-  pull_request:
-    types:
-      - closed
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 env:
   DB_NAME: realworld-app
   ORG_NAME: santunioni
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
+  environment: ephemeral-pr-${{ github.event.pull_request.number }}
 
 concurrency:
-  group: pr-${{ github.ref }}
+  group: ${{ inputs.environment }}
 
 permissions:
   id-token: write
@@ -29,9 +32,6 @@ jobs:
 
       - uses: ./.github/actions/credentials
 
-      - id: environment
-        uses: ./.github/actions/get_branch_environment_name
-
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.4
@@ -45,19 +45,16 @@ jobs:
           terraform refresh
           terraform destroy -auto-approve
         env:
-          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+          TF_VAR_ENVIRONMENT: ${{ inputs.environment }}
 
   pscale:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - id: environment
-        uses: ./.github/actions/get_branch_environment_name
-
       - name: Turn Down Database
         continue-on-error: true
         working-directory: .pscale/cli-helper-scripts
         run: |
           . use-pscale-docker-image.sh
-          pscale branch delete $DB_NAME ${{ steps.environment.outputs.name }} --org $ORG_NAME --force
+          pscale branch delete $DB_NAME ${{ inputs.environment }} --org $ORG_NAME --force

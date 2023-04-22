@@ -6,9 +6,11 @@ on:
       - main
 
 concurrency:
-  group: pr-${{ github.ref }}
+  group: ephemeral-pr-${{ github.event.pull_request.number }}
 
 jobs:
   ci:
     uses: ./.github/workflows/ci.yaml
     secrets: inherit
+    with:
+      environment: ephemeral-pr-${{ github.event.pull_request.number }}

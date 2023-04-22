@@ -15,6 +15,15 @@ jobs:
   ci:
     uses: ./.github/workflows/ci.yaml
     secrets: inherit
+    with:
+      environment: sandbox
+
+  clear:
+    needs: ci
+    uses: ./.github/workflows/clear.yaml
+    secrets: inherit
+    with:
+      environment: sandbox
 
   cd:
     needs: ci
