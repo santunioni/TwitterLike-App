@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "author": "Vinícius Vargas",
   "private": true,
+  "engines": {
+    "node": "18"
+  },
   "scripts": {
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "infra": "docker-compose up -d && docker-compose logs -f"
   },
   "devDependencies": {
+    "node": "^18.15.0",
     "@types/jest": "^27.5.1",
-    "@types/node": "^16",
+    "@types/node": "^18.15.13",
     "@vercel/ncc": "^0.36.1",
     "jest": "^28.1.0",
     "prettier-plugin-organize-imports": "^3.2.2",
@@ -16,7 +21,8 @@
     "prettier": "^2.7.1",
     "ts-jest": "^28.0.3",
     "ts-node": "^10.8.1",
-    "typescript": "^4.7.4"
+    "eslint": "8.39.0",
+    "typescript": "^5.0.4"
   },
   "workspaces": [
     "packages/*"
