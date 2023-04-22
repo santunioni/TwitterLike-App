@@ -13,6 +13,9 @@ env:
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
 
+concurrency:
+  group: pr-${{ github.ref }}
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
