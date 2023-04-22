@@ -268,7 +268,7 @@ export class ArticleEntity extends BaseEntity {
   @UpdateDateColumn()
   updatedAt!: Date
 
-  @Column()
+  @Column({ type: 'boolean' })
   published = false
 
   @Column({ type: 'integer', nullable: false })
