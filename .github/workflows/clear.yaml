@@ -46,13 +46,12 @@ jobs:
         working-directory: packages/server/terraform
         run: |
           touch lambda.zip
-          terraform workspace select $TF_VAR_ENVIRONMENT || exit 0
+          terraform workspace select ${{ inputs.environment }} || exit 0
           terraform init
           terraform refresh
           terraform destroy -auto-approve
-          terraform workspace delete $TF_VAR_ENVIRONMENT
+          terraform workspace delete ${{ inputs.environment }}
         env:
-          TF_VAR_ENVIRONMENT: ${{ inputs.environment }}
           TF_VAR_DATABASE_URL: mysql://realworld-app:realworld-app@localhost:3306/realworld-app
 
   pscale:
