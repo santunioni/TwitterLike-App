@@ -1,9 +1,9 @@
 {
-  "name": "real-world-app",
+  "name": "realworld-app",
   "version": "0.0.1",
   "description": "An API for publishing and reading articles.",
   "author": "Vinícius Vargas",
-  "private": false,
+  "private": true,
   "license": "MIT",
   "scripts": {
     "format": "prettier --write ."
@@ -19,12 +19,16 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.2",
     "ts-node": "10.9.1",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "5.0.3"
   },
   "workspaces": {
     "packages": [
       "packages/*"
     ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "semi": false
   }
 }

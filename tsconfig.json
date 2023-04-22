@@ -9,8 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "skipLibCheck": true,
+    "types": ["node", "jest"],
     "paths": {
-      "@/*": ["./packages/*/src"]
+      "*": ["./node_modules/*"],
+      "@packages/*": ["./packages/*/src"]
     }
   },
   "exclude": ["node_modules", "dist"]

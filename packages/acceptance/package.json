@@ -2,7 +2,7 @@
   "name": "@packages/acceptance",
   "version": "0.0.1",
   "author": "Vinícius Vargas",
-  "private": false,
+  "private": true,
   "license": "MIT",
   "scripts": {
     "test": "DRIVER=trpc jest && DRIVER=rest jest",
@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@packages/server": "0.0.1",
-    "@trpc/client": "^10.20.0"
+    "@trpc/client": "^10.20.0",
+    "node": "^18"
   },
   "devDependencies": {},
   "jest": {

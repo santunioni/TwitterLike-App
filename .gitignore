@@ -16,3 +16,4 @@ test.sql
 nohup.out
 /documentation/
 .env
+tsconfig.tsbuildinfo
