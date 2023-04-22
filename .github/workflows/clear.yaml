@@ -8,6 +8,10 @@ on:
       environment:
         required: true
         type: string
+      continue-on-error:
+        required: false
+        type: boolean
+        default: false
 
 env:
   DB_NAME: realworld-app
@@ -38,7 +42,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Clear Ephemeral Environments
-        continue-on-error: true
+        continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: packages/server/terraform
         run: |
           terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
@@ -54,7 +58,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Turn Down Database
-        continue-on-error: true
+        continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: scripts/pscale
         run: |
           . functions.sh
