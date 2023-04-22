@@ -10,6 +10,8 @@ permissions:
   contents: read
 
 env:
+  DB_NAME: realworld-app
+  ORG_NAME: santunioni
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
 
@@ -24,8 +26,8 @@ jobs:
       - id: dburl
         uses: ./.github/actions/create_pscale_db_branch_password
         with:
-          db_name: realworld-app
-          org_name: santunioni
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
           branch_name: main
 
       - run: npm install

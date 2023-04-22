@@ -6,7 +6,6 @@ on:
   workflow_call:
 
 env:
-  pscale_base_directory: .pscale
   DB_NAME: realworld-app
   ORG_NAME: santunioni
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
