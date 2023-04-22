@@ -59,7 +59,7 @@ export class UserTrpcDriver implements UserDriver {
             url: input.toString(),
             method: init?.method,
             data: init?.body,
-            headers: init.headers
+            headers: init?.headers
               ? Object.entries(init.headers).reduce((acc, [key, value]) => {
                   acc[key] = value
                   return acc
