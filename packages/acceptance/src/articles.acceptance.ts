@@ -1,5 +1,5 @@
-import { UserDSL } from './dsl/UserDSL'
 import { createUsers } from './dsl/createUsers'
+import { UserDSL } from './dsl/UserDSL'
 
 let abbott: UserDSL
 let costello: UserDSL

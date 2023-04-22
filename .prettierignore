@@ -6,3 +6,4 @@ dist/
 coverage/
 /documentation/
 build/
+package-lock.json
