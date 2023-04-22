@@ -41,8 +41,7 @@ jobs:
 
       - name: Typescript
         run: |
-          npm run typecheck --workspace packages/server
-          npm run typecheck --workspace packages/acceptance
+          npm run typecheck --workspaces
 
   server:
     name: Server Tests

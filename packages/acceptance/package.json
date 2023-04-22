@@ -1,15 +1,12 @@
 {
   "name": "@packages/acceptance",
   "version": "0.0.1",
-  "author": "Vinícius Vargas",
-  "private": false,
-  "license": "MIT",
   "scripts": {
     "test": "DRIVER=trpc jest && DRIVER=rest jest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@packages/server": "0.0.1",
+    "@packages/server": "1.0.0",
     "@trpc/client": "^10.20.0"
   },
   "devDependencies": {},

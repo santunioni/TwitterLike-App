@@ -1,17 +1,27 @@
 {
   "compilerOptions": {
-    "composite": true,
+    "outDir": "./dist",
+    "strict": true,
+    "target": "es2017",
+    "lib": ["es2019"],
+    "module": "commonjs",
+    "moduleResolution": "node",
     "sourceMap": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "incremental": true,
+    "noImplicitAny": false,
     "pretty": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "strictBindCallApply": false,
+
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "skipLibCheck": true,
     "paths": {
-      "@/*": ["./packages/*/src"]
+      "@packages/*": ["./packages/*"]
     }
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "bin"]
 }

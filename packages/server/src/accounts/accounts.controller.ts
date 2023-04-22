@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport'
 import { ApiBasicAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
+import { User } from '../nest/jwt.guard'
 import { ZodBody } from '../nest/validation.utils'
 import { UsersService } from './accounts.service'
 
@@ -49,7 +50,7 @@ export class AccountsController {
   @UseGuards(BasicAuthGuard)
   @ApiBasicAuth()
   @Post('login')
-  login(@Req() req) {
+  login(@Req() req: { user: User }) {
     return this.service.getJWTResponse(req.user)
   }
 }
