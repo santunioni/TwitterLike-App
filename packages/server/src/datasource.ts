@@ -1,4 +1,4 @@
-import assert from 'assert'
+import * as assert from 'assert'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 import { AccountEntity } from './accounts/accounts.entity'
