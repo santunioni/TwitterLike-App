@@ -14,6 +14,7 @@ env:
   ORG_NAME: santunioni
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
+  BRANCH_NAME: main
 
 jobs:
   deploy:
@@ -28,7 +29,7 @@ jobs:
         with:
           db_name: ${{ env.DB_NAME }}
           org_name: ${{ env.ORG_NAME }}
-          branch_name: main
+          branch_name: ${{ env.BRANCH_NAME }}
 
       - run: npm install
         shell: bash
@@ -54,9 +55,9 @@ jobs:
         name: Deploy Production
         working-directory: packages/server/terraform
         run: |
-          terraform init -reconfigure -backend-config="key=realworld-app/production/lambda.tfstate"
+          terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
           terraform refresh
           terraform apply -auto-approve
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
-          TF_VAR_ENVIRONMENT: production
+          TF_VAR_ENVIRONMENT: ${{ env.BRANCH_NAME }}
