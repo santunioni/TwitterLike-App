@@ -46,6 +46,7 @@ jobs:
           terraform destroy -auto-approve
         env:
           TF_VAR_ENVIRONMENT: ${{ inputs.environment }}
+          TF_VAR_DATABASE_URL: mysql://realworld-app:realworld-app@localhost:3306/realworld-app
 
   pscale:
     runs-on: ubuntu-latest
