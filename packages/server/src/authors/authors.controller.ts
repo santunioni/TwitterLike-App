@@ -179,9 +179,7 @@ export function createAuthorsTrpcRouter(
         ),
       update: trpc.protectedProcedure
         .input(UpdateProfileBody)
-        .mutation(({ ctx, input }) =>
-          controller.partialUpdate(ctx.user, input),
-        ),
+        .mutation(({ ctx, input }) => controller.update(ctx.user, input)),
       follow: trpc.protectedProcedure
         .input(z.object({ username }))
         .mutation(({ ctx, input }) =>
