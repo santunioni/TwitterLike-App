@@ -1,0 +1,58 @@
+name: Clear Ephemeral Environments
+
+run-name: Clear
+
+on:
+  pull_request:
+    types:
+      - closed
+
+env:
+  DB_NAME: realworld-app
+  ORG_NAME: santunioni
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
+
+concurrency:
+  group: pr-${{ github.ref }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./.github/actions/credentials
+
+      - id: environment
+        uses: ./.github/actions/get_branch_environment_name
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.4
+          terraform_wrapper: false
+
+      - name: Clear Ephemeral Environments
+        continue-on-error: true
+        working-directory: packages/server/terraform
+        run: |
+          terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
+          terraform refresh
+          terraform destroy -auto-approve
+        env:
+          TF_VAR_ENVIRONMENT: ${{ steps.environment.outputs.name }}
+
+  pscale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: environment
+        uses: ./.github/actions/get_branch_environment_name
+
+      - name: Turn Down Database
+        continue-on-error: true
+        working-directory: .pscale/cli-helper-scripts
+        run: |
+          . use-pscale-docker-image.sh
+          pscale branch delete $DB_NAME ${{ steps.environment.outputs.name }} --org $ORG_NAME --force

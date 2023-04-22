@@ -1,4 +1,6 @@
-name: Continuous Delivery Pipeline
+name: Continuous Delivery
+
+run-name: Continuous Delivery
 
 on:
   push:
@@ -12,13 +14,9 @@ concurrency:
 jobs:
   ci:
     uses: ./.github/workflows/ci.yaml
-
-  sandbox:
-    uses: ./.github/workflows/sandbox.yaml
-    needs: [ci]
     secrets: inherit
 
   cd:
-    needs: [sandbox]
+    needs: ci
     uses: ./.github/workflows/cd.yaml
     secrets: inherit

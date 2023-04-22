@@ -1,0 +1,30 @@
+{
+  "name": "@packages/acceptance",
+  "version": "0.0.1",
+  "author": "Vinícius Vargas",
+  "private": false,
+  "license": "MIT",
+  "scripts": {
+    "test": "DRIVER=trpc jest && DRIVER=rest jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@packages/server": "0.0.1",
+    "@trpc/client": "^10.20.0"
+  },
+  "devDependencies": {},
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "testRegex": ".*\\.acceptance\\.ts$"
+  }
+}

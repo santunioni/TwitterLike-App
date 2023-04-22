@@ -1,4 +1,6 @@
-name: Deploy
+name: Continuous Deployment
+
+run-name: Deployment
 
 on:
   workflow_call:
@@ -8,6 +10,8 @@ permissions:
   contents: read
 
 env:
+  DB_NAME: realworld-app
+  ORG_NAME: santunioni
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
 
@@ -22,15 +26,15 @@ jobs:
       - id: dburl
         uses: ./.github/actions/create_pscale_db_branch_password
         with:
-          db_name: realworld-app
-          org_name: santunioni
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
           branch_name: main
 
       - run: npm install
         shell: bash
         name: Dependencies
 
-      - run: npm run migration:run
+      - run: npm run migration:run --workspace packages/server
         shell: bash
         name: Migrations
         env:
@@ -44,9 +48,15 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: build
+          path: packages/server/terraform
 
       - id: terraform
-        run: make aws/terraform
+        name: Deploy ${{ steps.environment.outputs.name }}
+        working-directory: packages/server/terraform
+        run: |
+          terraform init -reconfigure -backend-config="key=realworld-app/production/lambda.tfstate"
+          terraform refresh
+          terraform apply -auto-approve
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: production
