@@ -5,18 +5,12 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  DB_NAME: realworld-app
-  ORG_NAME: santunioni
-  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
-  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
 
 jobs:
   list:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
