@@ -55,9 +55,11 @@ jobs:
         name: Deploy Production
         working-directory: packages/server/terraform
         run: |
-          terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
+          terraform workspace select $TF_VAR_ENVIRONMENT || terraform workspace new $TF_VAR_ENVIRONMENT
+          terraform init
           terraform refresh
           terraform apply -auto-approve
+          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
           TF_VAR_ENVIRONMENT: ${{ env.BRANCH_NAME }}
