@@ -1,6 +1,10 @@
 {
   "extends": "./../../tsconfig.json",
   "compilerOptions": {
-    "composite": true
+    "composite": true,
+    "module": "commonjs",
+    "baseUrl": ".",
+    "target": "es2017",
+    "sourceMap": true
   }
 }

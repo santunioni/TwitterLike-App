@@ -1,18 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "module": "commonjs",
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "baseUrl": ".",
     "target": "es2017",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "incremental": true,
-    "skipLibCheck": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true
+    "sourceMap": true
   }
 }

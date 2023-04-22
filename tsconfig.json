@@ -9,9 +9,15 @@
     "sourceMap": true,
     "baseUrl": ".",
     "skipLibCheck": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "incremental": true,
+    "noImplicitAny": false,
     "pretty": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "strictBindCallApply": false,
+
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@packages/*": ["./packages/*"]
