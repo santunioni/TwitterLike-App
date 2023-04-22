@@ -6,11 +6,9 @@ inputs:
   db_name:
     required: true
     description: The Database Name
-    default: realworld-app
   org_name:
     required: true
     description: The Database Organization Name
-    default: santunioni
   branch_name:
     required: true
     description: The Database Branch Name
