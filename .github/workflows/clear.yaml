@@ -45,7 +45,7 @@ jobs:
         continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: packages/server/terraform
         run: |
-          lambda.zip
+          touch lambda.zip
           terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
           terraform refresh
           terraform destroy -auto-approve
