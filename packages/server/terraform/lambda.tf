@@ -23,7 +23,7 @@ EOF
 }
 
 resource "aws_ssm_parameter" "database_url" {
-  name      = "/pscale/${var.PSCALE_ORG_NAME}/${var.PSCALE_DB_NAME}/${terraform.workspace == "default" ? "main" : terraform.workspace}/application"
+  name      = "/pscale/${var.PSCALE_ORG_NAME}/${var.PSCALE_DB_NAME}/${local.ENVIRONMENT}/application"
   value     = var.DATABASE_URL
   tier      = "Standard"
   type      = "SecureString"
