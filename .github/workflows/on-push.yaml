@@ -24,7 +24,6 @@ jobs:
     secrets: inherit
     with:
       environment: sandbox
-      continue-on-error: false
 
   cd:
     needs: ci

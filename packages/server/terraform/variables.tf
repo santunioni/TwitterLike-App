@@ -1,8 +1,3 @@
-variable "ENVIRONMENT" {
-  description = "The environment to deploy into"
-  type        = string
-}
-
 variable "DATABASE_URL" {
   description = "The database url"
   type        = string
@@ -29,9 +24,9 @@ data "aws_region" "current" {}
 
 locals {
   COMMON_TAGS = {
-    Environment = var.ENVIRONMENT
+    Environment = terraform.workspace
     RepoLink    = "https://github.com/santunioni/realworld-app"
   }
-  NAME     = "realworld-api-${var.ENVIRONMENT}"
+  NAME     = "realworld-api-${terraform.workspace}"
   BASE_URL = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${var.STAGE_NAME}"
 }

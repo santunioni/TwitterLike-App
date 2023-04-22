@@ -5,27 +5,19 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  DB_NAME: realworld-app
-  ORG_NAME: santunioni
-  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
-  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
-  BRANCH_NAME: main
-
 jobs:
   list:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/credentials
       - run: |
-          KEYS=$(aws s3api list-objects --bucket santunioni-iac-state --prefix realworld-app/ --output json --query 'Contents[*].Key' | jq '[.[] | select(endswith("lambda.tfstate"))]')
-          ENVIRONMENTS=$(echo $KEYS | jq '[.[] | sub("^realworld-app\/";"") | sub("lambda.tfstate$";"") | sub("\/";"") | select(. != "main") | select(. != "production") | select(. != "")]')
-          echo "ENVIRONMENTS=$(echo $ENVIRONMENTS | jq -r tostring)" >> $GITHUB_OUTPUT
+          KEYS=$(aws s3api list-objects --bucket santunioni-iac-state --prefix env:/ --output json --query 'Contents[*].Key' | jq '[.[] | select(. | test("realworld-app\/\\w+.tfstate$"))]')
+          TERRAFORM_WORKSPACES=$(echo $KEYS | jq '[.[] | sub("^env:\/";"") | sub("\/realworld-app\/\\w+.tfstate$";"")]')
+          echo "ENVIRONMENTS=$(echo $TERRAFORM_WORKSPACES | jq -r tostring)" >> $GITHUB_OUTPUT
         shell: bash
         id: list
     outputs:
@@ -37,6 +29,6 @@ jobs:
       matrix:
         environment: ${{ fromJson(needs.list.outputs.environments) }}
     uses: ./.github/workflows/clear.yaml
+    secrets: inherit
     with:
       environment: ${{ matrix.environment }}
-      continue-on-error: true
