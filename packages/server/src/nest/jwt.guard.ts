@@ -1,15 +1,6 @@
-import {
-  createParamDecorator,
-  ExecutionContext,
-  Injectable,
-  SetMetadata,
-  UnauthorizedException,
-} from '@nestjs/common'
+import { createParamDecorator, ExecutionContext, Injectable, SetMetadata, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import {
-  AuthGuard,
-  PassportStrategy as NestGuardStrategyFor,
-} from '@nestjs/passport'
+import { AuthGuard, PassportStrategy as NestGuardStrategyFor } from '@nestjs/passport'
 import { IncomingHttpHeaders } from 'http'
 import * as jwt from 'jsonwebtoken'
 import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt'
@@ -22,9 +13,7 @@ export class JWTAuthGuard extends AuthGuard('jwt') {
     super()
   }
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     // Add your custom authentication logic here
     // for example, call super.logIn(request) to establish a session.
     return super.canActivate(context)
@@ -33,10 +22,7 @@ export class JWTAuthGuard extends AuthGuard('jwt') {
   handleRequest(err, user, info, context: ExecutionContext) {
     // You can throw an exception based on either "info" or "err" arguments
     // console.log('Calling handleRequest from JWTAuthGuard')
-    const userIsOptional = this.reflector.get<boolean | null>(
-      authIsOptionalString,
-      context.getHandler(),
-    )
+    const userIsOptional = this.reflector.get<boolean | null>(authIsOptionalString, context.getHandler())
     if (!user && userIsOptional) {
       return null
     }

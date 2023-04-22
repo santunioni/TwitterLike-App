@@ -22,10 +22,7 @@ export interface Profile extends ProfileFields {
 @Injectable()
 export class AuthorsService {
   async getFollowingIds(profile: { id: number }) {
-    const following = await UserFollows.createQueryBuilder('uf')
-      .select()
-      .where({ userId: profile.id })
-      .getMany()
+    const following = await UserFollows.createQueryBuilder('uf').select().where({ userId: profile.id }).getMany()
     return following.map(uf => ({
       id: uf.followsId,
     }))
@@ -41,10 +38,7 @@ export class AuthorsService {
     return profile
   }
 
-  async createUserAuthorProfile(
-    user: User,
-    fields: ProfileFields,
-  ): Promise<Profile> {
+  async createUserAuthorProfile(user: User, fields: ProfileFields): Promise<Profile> {
     return await AuthorEntity.create({
       ...fields,
       accountId: user.id,
@@ -60,30 +54,20 @@ export class AuthorsService {
       where: { username: username },
     })
     if (!profile) {
-      throw new AuthorNotFound(
-        `I can't find a profile with username ${username}`,
-      )
+      throw new AuthorNotFound(`I can't find a profile with username ${username}`)
     }
     return profile
   }
 
   async getUserAuthorProfile(user: User): Promise<AuthorEntity> {
-    const profile = await AuthorEntity.createQueryBuilder('profile')
-      .select()
-      .where({ accountId: user.id })
-      .getOne()
+    const profile = await AuthorEntity.createQueryBuilder('profile').select().where({ accountId: user.id }).getOne()
     if (!profile) {
-      throw new AuthorNotFound(
-        `I can't find a profile with accountId ${user.id}`,
-      )
+      throw new AuthorNotFound(`I can't find a profile with accountId ${user.id}`)
     }
     return profile
   }
 
-  async updateUserAuthorProfile(
-    user: User,
-    fields: Partial<ProfileFields>,
-  ): Promise<AuthorEntity> {
+  async updateUserAuthorProfile(user: User, fields: Partial<ProfileFields>): Promise<AuthorEntity> {
     const profile = await this.getUserAuthorProfile(user)
     return await profile.loadData(fields).save()
   }
@@ -98,10 +82,7 @@ export class AuthorNotFound extends HttpException {
 
 export class AuthorAlreadyExists extends HttpException {
   constructor(username: string) {
-    super(
-      `Author with username ${username} already exist!`,
-      HttpStatus.CONFLICT,
-    )
+    super(`Author with username ${username} already exist!`, HttpStatus.CONFLICT)
     this.name = 'ArticleAlreadyExists'
   }
 }

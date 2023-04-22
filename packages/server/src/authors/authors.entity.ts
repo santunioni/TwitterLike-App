@@ -1,10 +1,4 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm'
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { User } from '../nest/jwt.guard'
 import { Profile, ProfileFields } from './authors.service'
 
@@ -65,18 +59,13 @@ export class UserFollows extends BaseEntity {
   @Column({ nullable: false, type: 'integer' })
   public followsId!: number
 
-  public static async exists(
-    user: AuthorEntity,
-    follows: AuthorEntity,
-  ): Promise<boolean> {
+  public static async exists(user: AuthorEntity, follows: AuthorEntity): Promise<boolean> {
     const following = await UserFollows.get(user, follows)
     return !!following
   }
 
   private static async get(user: AuthorEntity, follows: AuthorEntity) {
-    return await UserFollows.createQueryBuilder()
-      .where({ userId: user.id, followsId: follows })
-      .getOne()
+    return await UserFollows.createQueryBuilder().where({ userId: user.id, followsId: follows }).getOne()
   }
 
   public static async set(user: AuthorEntity, follows: AuthorEntity) {
@@ -88,9 +77,6 @@ export class UserFollows extends BaseEntity {
   }
 
   public static async unset(user: AuthorEntity, follows: AuthorEntity) {
-    await UserFollows.createQueryBuilder()
-      .delete()
-      .where({ userId: user.id, followsId: follows.id })
-      .execute()
+    await UserFollows.createQueryBuilder().delete().where({ userId: user.id, followsId: follows.id }).execute()
   }
 }

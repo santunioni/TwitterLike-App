@@ -1,26 +1,10 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common'
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import { createAuthorDTO } from '../authors/authors.controller'
 import { AuthorsService, Profile } from '../authors/authors.service'
-import {
-  AuthIsOptional,
-  GetUser,
-  JWTAuthGuard,
-  RequireUser,
-  User,
-} from '../nest/jwt.guard'
+import { AuthIsOptional, GetUser, JWTAuthGuard, RequireUser, User } from '../nest/jwt.guard'
 import { Pagination, ZodPagination } from '../nest/pagination'
 import { buildUrlToPath } from '../nest/url'
 import { ZodBody, ZodQuery } from '../nest/validation.utils'
@@ -34,21 +18,11 @@ export const slug = z
   .regex(/^[a-z0-9-]+$/)
   .describe('The slugified article title')
 
-const title = z
-  .string()
-  .describe('The article title. Example: "How to train your dragon"')
+const title = z.string().describe('The article title. Example: "How to train your dragon"')
 
-const description = z
-  .string()
-  .describe(
-    'The article description. Example: "Tips and tricks to train your dragon"',
-  )
+const description = z.string().describe('The article description. Example: "Tips and tricks to train your dragon"')
 
-const body = z
-  .string()
-  .describe(
-    'The article body. Example: "Give it a lot a training and feed it with fish."',
-  )
+const body = z.string().describe('The article body. Example: "Give it a lot a training and feed it with fish."')
 
 const tags = z
   .union([z.array(z.string()), z.string().transform(tags => tags?.split(','))])
@@ -72,10 +46,7 @@ export const ArticleFiltersDTO = z
   .object({
     tags: tags.optional(),
     author: z.string().optional().describe('The article author username'),
-    favorited: z.coerce
-      .boolean()
-      .optional()
-      .describe('Whether the article is favorited by you'),
+    favorited: z.coerce.boolean().optional().describe('Whether the article is favorited by you'),
   })
   .transform(o => {
     return {
@@ -95,32 +66,19 @@ type ArticleFiltersDTO = z.infer<typeof ArticleFiltersDTO>
 @UseGuards(JWTAuthGuard)
 @Controller('articles')
 export class ArticlesController {
-  constructor(
-    private articlesService: ArticlesService,
-    private authorsService: AuthorsService,
-  ) {}
+  constructor(private articlesService: ArticlesService, private authorsService: AuthorsService) {}
 
   @AuthIsOptional()
   @Get('feed')
-  async getFeed(
-    @GetUser() user: User | null,
-    @ZodQuery(ZodPagination) pagination: Pagination,
-  ) {
-    const view = this.articlesService.getView(
-      user ? await this.authorsService.getUserAuthorProfile(user) : undefined,
-    )
+  async getFeed(@GetUser() user: User | null, @ZodQuery(ZodPagination) pagination: Pagination) {
+    const view = this.articlesService.getView(user ? await this.authorsService.getUserAuthorProfile(user) : undefined)
     const articles = await view.getFeed(pagination)
     return {
-      articles: articles.map(article =>
-        createArticleDTO(article, article.author),
-      ),
+      articles: articles.map(article => createArticleDTO(article, article.author)),
       links:
         articles.length > 0
           ? {
-              next: buildUrlToPath(
-                'articles/feed',
-                pagination.getNextPage().toParams(),
-              ),
+              next: buildUrlToPath('articles/feed', pagination.getNextPage().toParams()),
             }
           : {},
     }
@@ -134,22 +92,14 @@ export class ArticlesController {
     filters: ArticleFiltersDTO,
     @ZodQuery(ZodPagination) pagination: Pagination,
   ) {
-    const view = this.articlesService.getView(
-      user ? await this.authorsService.getUserAuthorProfile(user) : undefined,
-    )
+    const view = this.articlesService.getView(user ? await this.authorsService.getUserAuthorProfile(user) : undefined)
     const articles = await view.getArticlesByFilters(filters, pagination)
     return {
-      articles: articles.map(article =>
-        createArticleDTO(article, article.author),
-      ),
+      articles: articles.map(article => createArticleDTO(article, article.author)),
       links:
         articles.length > 0
           ? {
-              next: buildUrlToPath(
-                'articles',
-                filters.toParams(),
-                pagination.getNextPage().toParams(),
-              ),
+              next: buildUrlToPath('articles', filters.toParams(), pagination.getNextPage().toParams()),
             }
           : {},
     }
@@ -158,9 +108,7 @@ export class ArticlesController {
   @AuthIsOptional()
   @Get(':slug')
   async getArticle(@GetUser() user: User | null, @Param('slug') slug: string) {
-    const view = this.articlesService.getView(
-      user ? await this.authorsService.getUserAuthorProfile(user) : undefined,
-    )
+    const view = this.articlesService.getView(user ? await this.authorsService.getUserAuthorProfile(user) : undefined)
     const article = await view.getArticle(slug)
     return {
       article: createArticleDTO(article, article.author),
@@ -225,10 +173,7 @@ export class ArticlesController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':slug/publication')
-  async unpublishArticle(
-    @RequireUser() user: User,
-    @Param('slug') slug: string,
-  ) {
+  async unpublishArticle(@RequireUser() user: User, @Param('slug') slug: string) {
     const me = await this.authorsService.getUserAuthorProfile(user)
     const cms = this.articlesService.getCMS(me)
     const article = await cms.unpublishArticle(slug)
@@ -238,11 +183,7 @@ export class ArticlesController {
   }
 }
 
-function createArticleDTO(
-  article: Article & Dated & Sluged & Tagged,
-  author: Profile,
-  favorited?: boolean,
-) {
+function createArticleDTO(article: Article & Dated & Sluged & Tagged, author: Profile, favorited?: boolean) {
   return {
     slug: article.slug,
     title: article.title,
@@ -261,10 +202,7 @@ function createArticleDTO(
   } as const
 }
 
-export function createArticlesTrpcRouter(
-  controller: ArticlesController,
-  trpc: TRPC,
-) {
+export function createArticlesTrpcRouter(controller: ArticlesController, trpc: TRPC) {
   return trpc.router({
     articles: trpc.router({
       getFeed: trpc.publicProcedure
@@ -273,9 +211,7 @@ export function createArticlesTrpcRouter(
             pagination: ZodPagination,
           }),
         )
-        .query(({ input, ctx }) =>
-          controller.getFeed(ctx.user, input.pagination),
-        ),
+        .query(({ input, ctx }) => controller.getFeed(ctx.user, input.pagination)),
       getMany: trpc.publicProcedure
         .input(
           z.object({
@@ -283,9 +219,7 @@ export function createArticlesTrpcRouter(
             filters: ArticleFiltersDTO,
           }),
         )
-        .query(({ input, ctx }) =>
-          controller.getManyArticles(ctx.user, input.filters, input.pagination),
-        ),
+        .query(({ input, ctx }) => controller.getManyArticles(ctx.user, input.filters, input.pagination)),
       getOne: trpc.publicProcedure
         .input(
           z.object({
@@ -295,9 +229,7 @@ export function createArticlesTrpcRouter(
         .query(({ input, ctx }) => controller.getArticle(ctx.user, input.slug)),
       create: trpc.protectedProcedure
         .input(CreateArticleDTO)
-        .mutation(({ input, ctx }) =>
-          controller.createArticle(ctx.user, input),
-        ),
+        .mutation(({ input, ctx }) => controller.createArticle(ctx.user, input)),
       update: trpc.protectedProcedure
         .input(
           z.object({
@@ -316,27 +248,21 @@ export function createArticlesTrpcRouter(
             slug,
           }),
         )
-        .mutation(({ input, ctx }) =>
-          controller.deleteArticle(ctx.user, input.slug),
-        ),
+        .mutation(({ input, ctx }) => controller.deleteArticle(ctx.user, input.slug)),
       publish: trpc.protectedProcedure
         .input(
           z.object({
             slug,
           }),
         )
-        .mutation(({ input, ctx }) =>
-          controller.publishArticle(ctx.user, input.slug),
-        ),
+        .mutation(({ input, ctx }) => controller.publishArticle(ctx.user, input.slug)),
       unpublish: trpc.protectedProcedure
         .input(
           z.object({
             slug,
           }),
         )
-        .mutation(({ input, ctx }) =>
-          controller.unpublishArticle(ctx.user, input.slug),
-        ),
+        .mutation(({ input, ctx }) => controller.unpublishArticle(ctx.user, input.slug)),
     }),
   })
 }

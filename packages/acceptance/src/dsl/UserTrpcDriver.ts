@@ -1,17 +1,11 @@
 import type { AppRouter } from '@packages/server/src'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 import type { HeadersEsque } from '@trpc/client/dist/internals/types'
-import axios, {
-  AxiosResponse,
-  AxiosResponseHeaders,
-  RawAxiosResponseHeaders,
-} from 'axios'
+import axios, { AxiosResponse, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios'
 import { Article, ArticleSearchFields, UserDriver } from './UserDriver'
 import { UserRestDriver } from './UserRestDriver'
 
-function convertAxiosHeadersToTrpcHeaders(
-  headers?: RawAxiosResponseHeaders | AxiosResponseHeaders,
-): HeadersEsque {
+function convertAxiosHeadersToTrpcHeaders(headers?: RawAxiosResponseHeaders | AxiosResponseHeaders): HeadersEsque {
   const trpcMap = Object.entries(headers ?? {}).reduce((acc, [key, value]) => {
     value && acc.set(key, String(value))
     return acc
@@ -147,17 +141,13 @@ export class UserTrpcDriver implements UserDriver {
   }
 
   async shouldNotFindTheArticle(slug: string) {
-    await expect(this.trpc.articles.getOne.query({ slug })).rejects.toThrow(
-      /404/,
-    )
+    await expect(this.trpc.articles.getOne.query({ slug })).rejects.toThrow(/404/)
   }
 
   async shouldSeeCommentFrom(slug: string, username: string) {
     const response = await this.trpc.comments.getMany.query({
       slug,
     })
-    expect(response.comments.map(v => v.author.username)).toContainEqual(
-      username,
-    )
+    expect(response.comments.map(v => v.author.username)).toContainEqual(username)
   }
 }

@@ -9,14 +9,7 @@ import { UsersService } from './accounts.service'
 
 const CreateUserDTO = z.object({
   email: z.string().email(),
-  password: z
-    .string()
-    .min(8)
-    .max(32)
-    .regex(/[A-Z]/)
-    .regex(/[a-z]/)
-    .regex(/\d/)
-    .regex(/\W/),
+  password: z.string().min(8).max(32).regex(/[A-Z]/).regex(/[a-z]/).regex(/\d/).regex(/\W/),
 })
 
 export type CreateUserDTO = z.infer<typeof CreateUserDTO>

@@ -1,9 +1,6 @@
 import { getEnvs } from '../environment'
 
-export function buildUrlToPath(
-  path: string,
-  ...paramsArray: Record<string, string | number>[]
-): string {
+export function buildUrlToPath(path: string, ...paramsArray: Record<string, string | number>[]): string {
   const { BASE_URL } = getEnvs()
 
   path = path.replace(/^\//, '').replace(/\/$/, '')

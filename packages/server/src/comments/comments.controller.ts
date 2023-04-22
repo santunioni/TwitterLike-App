@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Post,
-  UseGuards,
-} from '@nestjs/common'
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 
 import { z } from 'zod'
@@ -24,10 +14,7 @@ import { ZodBody, ZodQuery } from '../nest/validation.utils'
 import { TRPC } from '../trpc/app'
 import { Comment, CommentsRepository } from './comments.repository'
 
-const body = z
-  .string()
-  .max(255)
-  .describe("The comment body. Example: 'I liked that article'")
+const body = z.string().max(255).describe("The comment body. Example: 'I liked that article'")
 
 const CommentDTO = z.object({
   body,
@@ -62,11 +49,7 @@ export class CommentsController {
   ) {
     const me = await this.authorsService.getUserAuthorProfile(user)
     const article = await this.articlesService.getView(me).getArticle(slug)
-    const comment = await this.commentsRepository.commentArticle(
-      me,
-      article,
-      body.comment.body,
-    )
+    const comment = await this.commentsRepository.commentArticle(me, article, body.comment.body)
     return {
       comment: createCommentDTO(slug, comment, me),
     } as const
@@ -79,30 +62,20 @@ export class CommentsController {
     @Param('slug') slug: string,
     @ZodQuery(ZodPagination) pagination: Pagination,
   ) {
-    const me = user
-      ? await this.authorsService.getUserAuthorProfile(user)
-      : undefined
+    const me = user ? await this.authorsService.getUserAuthorProfile(user) : undefined
     const article = await this.articlesService.getView(me).getArticle(slug)
-    const comments = await this.commentsRepository.getCommentsFromArticle(
-      article,
-      pagination,
-    )
+    const comments = await this.commentsRepository.getCommentsFromArticle(article, pagination)
     return {
       comments: await Promise.all(
         comments.map(async comment => {
-          const author = await this.authorsService.getAuthorById(
-            comment.authorId,
-          )
+          const author = await this.authorsService.getAuthorById(comment.authorId)
           return createCommentDTO(slug, comment, author)
         }),
       ),
       links:
         comments.length > 0
           ? {
-              next: buildUrlToPath(
-                `articles/${slug}/comments`,
-                pagination.getNextPage().toParams(),
-              ),
+              next: buildUrlToPath(`articles/${slug}/comments`, pagination.getNextPage().toParams()),
             }
           : {},
     } as const
@@ -126,11 +99,7 @@ export class CommentsController {
   }
 }
 
-function createCommentDTO(
-  articleSlug: string,
-  comment: Comment,
-  author: Profile,
-) {
+function createCommentDTO(articleSlug: string, comment: Comment, author: Profile) {
   return {
     id: comment.id,
     body: comment.body,
@@ -144,10 +113,7 @@ function createCommentDTO(
   } as const
 }
 
-export function createCommentsTrpcRouter(
-  controller: CommentsController,
-  trpc: TRPC,
-) {
+export function createCommentsTrpcRouter(controller: CommentsController, trpc: TRPC) {
   return trpc.router({
     comments: trpc.router({
       add: trpc.protectedProcedure
@@ -169,13 +135,7 @@ export function createCommentsTrpcRouter(
             pagination: ZodPagination,
           }),
         )
-        .query(({ input, ctx }) =>
-          controller.getCommentsFromAnArticle(
-            ctx.user,
-            input.slug,
-            input.pagination,
-          ),
-        ),
+        .query(({ input, ctx }) => controller.getCommentsFromAnArticle(ctx.user, input.slug, input.pagination)),
       delete: trpc.protectedProcedure
         .input(
           z.object({
@@ -183,9 +143,7 @@ export function createCommentsTrpcRouter(
             id: z.number(),
           }),
         )
-        .query(({ input, ctx }) =>
-          controller.deleteCommentFromArticle(ctx.user, input.slug, input.id),
-        ),
+        .query(({ input, ctx }) => controller.deleteCommentFromArticle(ctx.user, input.slug, input.id)),
     }),
   })
 }

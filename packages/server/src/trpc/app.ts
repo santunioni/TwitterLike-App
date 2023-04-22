@@ -12,11 +12,7 @@ export async function createContext({ req }) {
 
 export type Context = inferAsyncReturnType<typeof createContext>
 
-const notFoundErrors = [
-  CommentNotFoundException,
-  AuthorNotFound,
-  ArticleNotFound,
-]
+const notFoundErrors = [CommentNotFoundException, AuthorNotFound, ArticleNotFound]
 
 export function createTRPCApp() {
   const t = initTRPC.context<Context>().create()

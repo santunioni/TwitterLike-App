@@ -49,10 +49,7 @@ export class UserDSL {
   }
 
   async commentOnArticle(slug?: string, comment?: string) {
-    await this.driver.commentOnArticle(
-      slug || this.slug,
-      comment || 'I liked that article!',
-    )
+    await this.driver.commentOnArticle(slug || this.slug, comment || 'I liked that article!')
   }
 
   async publishAnArticle(article: PartialArticle = {}) {

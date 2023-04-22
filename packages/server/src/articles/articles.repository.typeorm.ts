@@ -26,9 +26,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
     },
     pagination?: { take: number; skip: number },
   ) {
-    const qb = this.entityManager
-      .createQueryBuilder(ArticleEntity, 'article')
-      .where('true')
+    const qb = this.entityManager.createQueryBuilder(ArticleEntity, 'article').where('true')
 
     if (options.filterBySlug) {
       qb.andWhere({ slug: options.filterBySlug })
@@ -118,10 +116,9 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
       throw new Error('Multiple articles returned unexpectedly')
     }
 
-    return this.getArticles(
-      { filterBySlug: newSlug ?? slug, owner },
-      { take: 1, skip: 0 },
-    ).then(articles => articles[0])
+    return this.getArticles({ filterBySlug: newSlug ?? slug, owner }, { take: 1, skip: 0 }).then(
+      articles => articles[0],
+    )
   }
 
   async deleteArticle(slug: string, owner: { id: number }) {
@@ -143,9 +140,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
     return await this.updateArticle(slug, owner, { published: false })
   }
 
-  private createArticleResponse(
-    article: any,
-  ): Article & { id: number } & Authored & Sluged & Dated {
+  private createArticleResponse(article: any): Article & { id: number } & Authored & Sluged & Dated {
     article.createdAt = article.createdAt ?? article.created_at
     article.updatedAt = article.updatedAt ?? article.updated_at
     article.author = article.author ?? {
@@ -164,10 +159,7 @@ export class TypeORMArticlesRepository implements ArticlesRepository {
 export class TypeORMTagsRepository implements TagsRepository {
   private readonly queries: {
     createTags: (tags: string[]) => Promise<void>
-    insertMissingTags: (
-      tags: string[],
-      article: { id: number },
-    ) => Promise<void>
+    insertMissingTags: (tags: string[], article: { id: number }) => Promise<void>
     unsetOtherTags: (tags: string[], article: { id: number }) => Promise<void>
   }
 
@@ -193,12 +185,7 @@ export class TypeORMTagsRepository implements TagsRepository {
     } else if (this.entityManager.connection.options.type === 'mysql') {
       this.queries = {
         createTags: (tags: string[]) =>
-          this.entityManager.query(
-            `INSERT IGNORE INTO tags (name) VALUES ${tags
-              .map(() => '(?)')
-              .join(', ')};`,
-            tags,
-          ),
+          this.entityManager.query(`INSERT IGNORE INTO tags (name) VALUES ${tags.map(() => '(?)').join(', ')};`, tags),
         insertMissingTags: (tags: string[], article: { id: number }) =>
           this.entityManager.query(
             'INSERT IGNORE INTO articles_have_tags (tag_id, article_id) SELECT id, ? FROM tags WHERE name IN (?);',
@@ -211,16 +198,11 @@ export class TypeORMTagsRepository implements TagsRepository {
           ),
       }
     } else {
-      throw new Error(
-        `No queries for engine ${this.entityManager.connection.options.type}`,
-      )
+      throw new Error(`No queries for engine ${this.entityManager.connection.options.type}`)
     }
   }
 
-  async setArticleTags(
-    article: { id: number },
-    tags: string[],
-  ): Promise<string[]> {
+  async setArticleTags(article: { id: number }, tags: string[]): Promise<string[]> {
     await this.queries.createTags(tags)
     await this.queries.insertMissingTags(tags, article)
     await this.queries.unsetOtherTags(tags, article)

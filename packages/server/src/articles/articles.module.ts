@@ -3,10 +3,7 @@ import { EntityManager } from 'typeorm'
 import { AuthorsModule } from '../authors/authors.module'
 import { AuthorsService } from '../authors/authors.service'
 import { ArticlesController } from './articles.controller'
-import {
-  TypeORMArticlesRepository,
-  TypeORMTagsRepository,
-} from './articles.repository.typeorm'
+import { TypeORMArticlesRepository, TypeORMTagsRepository } from './articles.repository.typeorm'
 import { ArticlesService } from './articles.service'
 
 @Module({
@@ -15,10 +12,7 @@ import { ArticlesService } from './articles.service'
   providers: [
     {
       provide: ArticlesService,
-      useFactory: (
-        authorsService: AuthorsService,
-        entityManager: EntityManager,
-      ) => {
+      useFactory: (authorsService: AuthorsService, entityManager: EntityManager) => {
         return new ArticlesService(
           authorsService,
           new TypeORMTagsRepository(entityManager),

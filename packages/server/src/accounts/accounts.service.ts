@@ -31,16 +31,12 @@ export class UsersService {
   getJWTResponse(user: User) {
     const { AUDIENCE, TOKEN_PRIVATE_KEY } = getEnvs()
     return {
-      access_token: jwt.sign(
-        { account_id: user.id, email: user.email },
-        TOKEN_PRIVATE_KEY,
-        {
-          expiresIn: '24h',
-          subject: user.id.toString(),
-          issuer: user.id.toString(),
-          audience: AUDIENCE,
-        },
-      ),
+      access_token: jwt.sign({ account_id: user.id, email: user.email }, TOKEN_PRIVATE_KEY, {
+        expiresIn: '24h',
+        subject: user.id.toString(),
+        issuer: user.id.toString(),
+        audience: AUDIENCE,
+      }),
     } as const
   }
 }

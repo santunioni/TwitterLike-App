@@ -36,6 +36,7 @@
     "trailingComma": "all",
     "semi": false,
     "bracketSameLine": true,
-    "arrowParens": "avoid"
+    "arrowParens": "avoid",
+    "printWidth": 120
   }
 }

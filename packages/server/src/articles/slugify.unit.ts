@@ -7,9 +7,7 @@ describe('slugify', () => {
     expect(slugify(' Testing  123 ')).toEqual('testing-123')
     expect(slugify('héllo wórld')).toEqual('hello-world')
     expect(slugify('Über Café 42')).toEqual('ueber-cafe-42')
-    expect(slugify('3 things to know about Pokémon GO')).toEqual(
-      '3-things-to-know-about-pokemon-go',
-    )
+    expect(slugify('3 things to know about Pokémon GO')).toEqual('3-things-to-know-about-pokemon-go')
   })
 
   it('should handle special characters', () => {

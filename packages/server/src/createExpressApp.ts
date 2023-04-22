@@ -16,10 +16,7 @@ export async function createNestApplication(baseApiUrl: string) {
   SwaggerModule.setup(
     'docs',
     nest,
-    SwaggerModule.createDocument(
-      nest,
-      createPreConfiguredOpenAPIDocumentBuilder().addServer(baseApiUrl).build(),
-    ),
+    SwaggerModule.createDocument(nest, createPreConfiguredOpenAPIDocumentBuilder().addServer(baseApiUrl).build()),
     {
       useGlobalPrefix: true,
     },

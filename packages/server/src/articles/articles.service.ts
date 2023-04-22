@@ -1,12 +1,7 @@
 import { NotFoundException } from '@nestjs/common'
 import { AuthorNotFound, AuthorsService } from '../authors/authors.service'
 import { Article, Tagged } from './articles.models'
-import {
-  ArticleFilters,
-  ArticlesRepository,
-  Pagination,
-  TagsRepository,
-} from './articles.repository'
+import { ArticleFilters, ArticlesRepository, Pagination, TagsRepository } from './articles.repository'
 import { slugify } from './slugify'
 
 export class ArticlesService {
@@ -17,20 +12,11 @@ export class ArticlesService {
   ) {}
 
   getCMS(author: { id: number }) {
-    return new ContentManagementSystem(
-      this.tagsRepository,
-      this.articlesRepository,
-      author,
-    )
+    return new ContentManagementSystem(this.tagsRepository, this.articlesRepository, author)
   }
 
   getView(author?: { id: number }) {
-    return new ArticleView(
-      this.tagsRepository,
-      this.articlesRepository,
-      this.authorsService,
-      author,
-    )
+    return new ArticleView(this.tagsRepository, this.articlesRepository, this.authorsService, author)
   }
 }
 
@@ -51,17 +37,13 @@ export class ArticleView {
       throw new ArticleNotFound(slug)
     }
     if (articles.length > 1) {
-      throw new Error(
-        `Multiple articles with the same slug: ${JSON.stringify(articles)}`,
-      )
+      throw new Error(`Multiple articles with the same slug: ${JSON.stringify(articles)}`)
     }
     const article = articles[0]
     return await this.addTagsAndAuthorToArticle(article)
   }
 
-  private async addTagsAndAuthorToArticle<
-    A extends { id: number; author: { id: number } },
-  >(article: A) {
+  private async addTagsAndAuthorToArticle<A extends { id: number; author: { id: number } }>(article: A) {
     const tags = await this.tagsRepository.getArticleTags(article)
     const author = await this.authorsService.getAuthorById(article.author.id)
     return { ...article, tags, author }
@@ -84,9 +66,7 @@ export class ArticleView {
       pagination,
     )
 
-    return Promise.all(
-      articles.map(article => this.addTagsAndAuthorToArticle(article)),
-    )
+    return Promise.all(articles.map(article => this.addTagsAndAuthorToArticle(article)))
   }
 
   private async getGlobalFeed(pagination?: Pagination) {
@@ -98,16 +78,12 @@ export class ArticleView {
       const articles = await this.articlesRepository.getArticles(
         {
           filterByTags: filters.tags,
-          filterByAuthors: filters.author
-            ? [await this.authorsService.getAuthorByUsername(filters.author)]
-            : undefined,
+          filterByAuthors: filters.author ? [await this.authorsService.getAuthorByUsername(filters.author)] : undefined,
           owner: this.owner,
         },
         pagination,
       )
-      return await Promise.all(
-        articles.map(article => this.addTagsAndAuthorToArticle(article)),
-      )
+      return await Promise.all(articles.map(article => this.addTagsAndAuthorToArticle(article)))
     } catch (error) {
       if (error instanceof AuthorNotFound) {
         return []
@@ -131,20 +107,13 @@ export class ContentManagementSystem {
 
   async createArticle(data: Article & Tagged) {
     const slug = slugify(data.title)
-    const article = await this.articlesRepository.createArticle(
-      { ...data, slug },
-      this.owner,
-    )
+    const article = await this.articlesRepository.createArticle({ ...data, slug }, this.owner)
     const tags = await this.tagsRepository.setArticleTags(article, data.tags)
     return { ...article, tags, author: this.owner }
   }
 
   async updateArticle(slug: string, snapshot: Partial<Article & Tagged>) {
-    const article = await this.articlesRepository.updateArticle(
-      slug,
-      this.owner,
-      snapshot,
-    )
+    const article = await this.articlesRepository.updateArticle(slug, this.owner, snapshot)
     const tags = snapshot.tags
       ? await this.tagsRepository.setArticleTags(article, snapshot.tags)
       : await this.tagsRepository.getArticleTags(article)
@@ -156,19 +125,13 @@ export class ContentManagementSystem {
   }
 
   async publishArticle(slug: string) {
-    const article = await this.articlesRepository.publishArticle(
-      slug,
-      this.owner,
-    )
+    const article = await this.articlesRepository.publishArticle(slug, this.owner)
     const tags = await this.tagsRepository.getArticleTags(article)
     return { ...article, tags, author: this.owner }
   }
 
   async unpublishArticle(slug: string) {
-    const article = await this.articlesRepository.unpublishArticle(
-      slug,
-      this.owner,
-    )
+    const article = await this.articlesRepository.unpublishArticle(slug, this.owner)
     const tags = await this.tagsRepository.getArticleTags(article)
     return { ...article, tags, author: this.owner }
   }
