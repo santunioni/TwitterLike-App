@@ -46,9 +46,11 @@ jobs:
         working-directory: packages/server/terraform
         run: |
           touch lambda.zip
-          terraform init -reconfigure -backend-config="key=realworld-app/$TF_VAR_ENVIRONMENT/lambda.tfstate"
+          terraform workspace select $TF_VAR_ENVIRONMENT || exit 0
+          terraform init
           terraform refresh
           terraform destroy -auto-approve
+          terraform workspace delete $TF_VAR_ENVIRONMENT
         env:
           TF_VAR_ENVIRONMENT: ${{ inputs.environment }}
           TF_VAR_DATABASE_URL: mysql://realworld-app:realworld-app@localhost:3306/realworld-app

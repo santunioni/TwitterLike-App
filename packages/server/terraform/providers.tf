@@ -10,7 +10,7 @@ terraform {
     bucket         = "santunioni-iac-state"
     region         = "us-east-1"
     dynamodb_table = "santunioni-iac-state-lock"
-    key            = "realworld-app/production/lambda.tfstate"
+    key            = "realworld-app/server.tfstate"
   }
 }
 
