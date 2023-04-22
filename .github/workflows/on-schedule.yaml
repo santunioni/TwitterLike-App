@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/credentials
       - run: |
-          KEYS=$(aws s3api list-objects --bucket loft-iac-695394886911 --prefix realworld-app/ --output json --query 'Contents[*].Key' | jq '[.[] | select(endswith("lambda.tf"))]')
+          KEYS=$(aws s3api list-objects --bucket santunioni-iac-state --prefix realworld-app/ --output json --query 'Contents[*].Key' | jq '[.[] | select(endswith("lambda.tf"))]')
           ENVIRONMENTS=jq '[.[] | sub("^realworld-app\/";"") | sub("\/lambda.tf$";"") | select(. != "main") | select(. != "production")]'
           echo "ENVIRONMENTS=$ENVIRONMENTS" >> $GITHUB_OUTPUT
         shell: bash
