@@ -1,0 +1,42 @@
+name: Clear Environments
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  DB_NAME: realworld-app
+  ORG_NAME: santunioni
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
+  BRANCH_NAME: main
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/credentials
+      - run: |
+          KEYS=$(aws s3api list-objects --bucket loft-iac-695394886911 --prefix realworld-app/ --output json --query 'Contents[*].Key' | jq '[.[] | select(endswith("lambda.tf"))]')
+          ENVIRONMENTS=jq '[.[] | sub("^realworld-app\/";"") | sub("\/lambda.tf$";"") | select(. != "main") | select(. != "production")]'
+          echo "ENVIRONMENTS=$ENVIRONMENTS" >> $GITHUB_OUTPUT
+        shell: bash
+        id: list
+    outputs:
+      environments: ${{ steps.list.outputs.ENVIRONMENTS }}
+
+  clear:
+    needs: list
+    strategy:
+      matrix:
+        environment: ${{ fromJson(needs.list.outputs.environments) }}
+    uses: ./.github/workflows/clear.yaml
+    with:
+      environment: ${{ matrix.environment }}
+      continue-on-error: true
