@@ -10,7 +10,6 @@
     "start:dev": "NODE_ENV=development nest start",
     "start:debug": "NODE_ENV=development nest start --debug --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "openapi": "ts-node src/nest/openapi.ts",
     "typeorm": "ts-node --compilerOptions '{\"emitDecoratorMetadata\":true,\"experimentalDecorators\":true,\"target\":\"es6\"}' --transpile-only $(which typeorm) --dataSource ./ormconfig.ts",
     "migration:run": "npm run typeorm migration:run",

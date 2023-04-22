@@ -17,7 +17,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "strictBindCallApply": false,
-
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@packages/*": ["./packages/*"]
