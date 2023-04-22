@@ -8,17 +8,12 @@ on:
       environment:
         required: true
         type: string
-      continue-on-error:
-        required: false
-        type: boolean
-        default: false
 
 env:
   DB_NAME: realworld-app
   ORG_NAME: santunioni
   PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
-  environment: ephemeral-pr-${{ github.event.pull_request.number }}
 
 concurrency:
   group: ${{ inputs.environment }}
@@ -42,14 +37,14 @@ jobs:
           terraform_wrapper: false
 
       - name: Clear Computing Resources
-        continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: packages/server/terraform
         run: |
           touch lambda.zip
           terraform init
-          terraform workspace select ${{ inputs.environment }} || exit 0
+          terraform workspace select ${{ inputs.environment }} || echo "Non existent workspace" && exit 0
           terraform refresh
           terraform destroy -auto-approve
+          terraform workspace select default
           terraform workspace delete ${{ inputs.environment }}
         env:
           TF_VAR_DATABASE_URL: mysql://realworld-app:realworld-app@localhost:3306/realworld-app
@@ -60,9 +55,14 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Clear Database
-        continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: scripts/pscale
         run: |
           . functions.sh
 
-          pscale branch delete $DB_NAME ${{ inputs.environment }} --org $ORG_NAME --force
+          BRANCH_EXISTS=$(pscale branch list $DB_NAME --org $ORG_NAME | jq -r '.[] | select(.name == "${{ inputs.environment }}") | .name')
+          if [ -z "$BRANCH_EXISTS" ]; then
+            echo "Branch ${{ inputs.environment }} does not exist"
+            exit 0
+          fi
+
+          pscale branch delete $DB_NAME $BRANCH_EXISTS --org $ORG_NAME --force
