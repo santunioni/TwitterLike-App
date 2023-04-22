@@ -1,9 +1,6 @@
 {
   "name": "@packages/server",
   "version": "1.0.0",
-  "author": "Vinícius Vargas",
-  "private": true,
-  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build:lambda": "ncc build src/lambda.ts --minify --out build/lambda && cd build/lambda && zip -r ../../terraform/lambda.zip * && cd - && rm -rf build/lambda",

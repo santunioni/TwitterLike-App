@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "./dist",
     "strict": true,
-    "target": "es2016",
+    "target": "es2017",
     "lib": ["es2019"],
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
-    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
     "pretty": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "skipLibCheck": true,
     "paths": {
       "@packages/*": ["./packages/*"]
     }

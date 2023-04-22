@@ -150,7 +150,9 @@ export class UserTrpcDriver implements UserDriver {
   }
 
   async shouldFindTheArticle(slug: string) {
-    const response = await this.trpc.articles.getOne.query({ slug })
+    const response = await this.trpc.articles.getOne.query({
+      slug,
+    })
     expect(response.article.slug).toEqual(slug)
   }
 
