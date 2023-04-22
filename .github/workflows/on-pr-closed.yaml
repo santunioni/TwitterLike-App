@@ -1,11 +1,13 @@
 name: On PR Closed
 
+run-name: Destroying ephemeral-pr-${{ github.event.pull_request.number }}
+
 on:
   pull_request:
     types: [closed]
 
 jobs:
-  clear-ephemeral:
+  clear:
     uses: ./.github/workflows/clear.yaml
     with:
       environment: ephemeral-pr-${{ github.event.pull_request.number }}
