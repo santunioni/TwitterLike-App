@@ -1,4 +1,4 @@
-import { Controller, Injectable, Post, Req, UseGuards } from '@nestjs/common'
+import { Controller, HttpCode, HttpStatus, Injectable, Post, Req, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiBasicAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
@@ -43,6 +43,7 @@ export class AccountsController {
   @UseGuards(BasicAuthGuard)
   @ApiBasicAuth()
   @Post('login')
+  @HttpCode(HttpStatus.CREATED)
   login(@Req() req: { user: User }) {
     return this.service.getJWTResponse(req.user)
   }

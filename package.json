@@ -8,7 +8,10 @@
   },
   "scripts": {
     "format": "prettier --write .",
-    "infra": "docker-compose up -d && docker-compose logs -f"
+    "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "start:dev": "concurrently --kill-others \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
+    "start:watch": "concurrently --kill-others \"npm run start:watch --workspace packages/server\" \"npm run start:watch --workspace packages/client\""
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
@@ -16,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "@vercel/ncc": "^0.36.1",
+    "concurrently": "^8.0.1",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",

@@ -2,7 +2,7 @@
   "name": "@packages/acceptance",
   "version": "0.0.1",
   "scripts": {
-    "test": "DRIVER=trpc jest && DRIVER=rest jest",
+    "test": "concurrently --kill-others \"DRIVER=trpc jest\" \"DRIVER=rest jest\"",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts src --fix"

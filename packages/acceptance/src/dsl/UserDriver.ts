@@ -31,10 +31,3 @@ export interface UserDriver {
   shouldNotSeeTheArticleInTheFeed(slug: string): Promise<void>
   shouldSeeCommentFrom(slug: string, username: string): Promise<void>
 }
-
-export function createCredentials(username: string) {
-  return {
-    email: process.env[`EMAIL_${username.toUpperCase()}`] || `${username.toLowerCase()}.testuser@mail.com`,
-    password: process.env[`PASSWORD_${username.toUpperCase()}`] || 'asdaWAdji!oi8809jk',
-  }
-}
