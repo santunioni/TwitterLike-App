@@ -38,9 +38,9 @@ export async function createExpressApp() {
     trpcExpress.createExpressMiddleware({
       createContext: createContext,
       router: createMergedTRPCApp(
-        nest.get(CommentsController),
-        nest.get(ArticlesController),
-        nest.get(AuthorsController),
+        nest.get(CommentsController) as CommentsController,
+        nest.get(ArticlesController) as ArticlesController,
+        nest.get(AuthorsController) as AuthorsController,
       ),
       onError: err => delete err.error.stack, // Don't expose internal failures to the World
     }),
