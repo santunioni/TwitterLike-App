@@ -1,5 +1,6 @@
 import { Axios } from 'axios'
-import { Article, ArticleSearchFields, createCredentials, UserDriver } from './UserDriver'
+import { AccountsDriver } from './AccountsDSL'
+import { Article, ArticleSearchFields, UserDriver } from './UserDriver'
 
 export class UserRestDriver implements UserDriver {
   private axios = new Axios({
@@ -13,34 +14,20 @@ export class UserRestDriver implements UserDriver {
     validateStatus: status => status < 500,
   })
 
-  async createAccount(username: string) {
-    const sign = await this.axios.post('accounts/signup', {
-      user: createCredentials(username),
-    })
-
-    expect(sign.status).toBe(201)
-    expect(sign.data.access_token).toBeDefined()
-
-    return sign.data.access_token
-  }
-
-  private async createProfile(username: string) {
-    const response = await this.axios.post('profiles', {
-      profile: {
-        username: username,
-        bio: `Me chamo ${username}`,
-        image: 'https://static.productionready.io/images/smiley-cyrus.jpg',
+  async login(username: string) {
+    const credentials = AccountsDriver.getUserCredentials(username)
+    const response = await this.axios.post('accounts/login', undefined, {
+      auth: {
+        username: credentials.email,
+        password: credentials.password,
       },
     })
     expect(response.status).toBe(201)
-  }
-
-  async login(username: string) {
-    const token = await this.createAccount(username)
+    const token = response.data.access_token
     this.axios.defaults.headers.common = {
       Authorization: `Bearer ${token}`,
     }
-    await this.createProfile(username)
+    return token
   }
 
   async follow(username: string) {

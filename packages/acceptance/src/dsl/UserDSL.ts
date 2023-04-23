@@ -3,12 +3,19 @@ import { ArticleSearchFields, PartialArticle, UserDriver } from './UserDriver'
 
 export class UserDSL {
   constructor(
-    public readonly username: string,
     private driver: UserDriver,
     private context: {
       slug?: string
     } = {},
+    public readonly _username?: string,
   ) {}
+
+  get username() {
+    if (!this._username) {
+      throw new Error('No username provided')
+    }
+    return this._username
+  }
 
   private get slug() {
     if (!this.context.slug) {

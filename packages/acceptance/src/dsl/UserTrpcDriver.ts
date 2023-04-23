@@ -69,15 +69,8 @@ export class UserTrpcDriver implements UserDriver {
   })
 
   async login(username: string) {
-    const token = await this.restClient.createAccount(username)
+    const token = await this.restClient.login(username)
     this.authorization = `Bearer ${token}`
-    await this.trpc.profiles.create.mutate({
-      profile: {
-        username: username,
-        bio: `Me chamo ${username}`,
-        image: 'https://static.productionready.io/images/smiley-cyrus.jpg',
-      },
-    })
   }
 
   async follow(username: string) {

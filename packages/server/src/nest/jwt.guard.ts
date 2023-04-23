@@ -64,6 +64,11 @@ export function getUserFromHeaders(headers: IncomingHttpHeaders): User | null {
   }
 
   const token = authorization.split(' ')[1]
+
+  if (!token) {
+    return null
+  }
+
   const result = jwt.verify(token, TOKEN_PRIVATE_KEY, {
     audience: AUDIENCE,
     complete: true,
@@ -84,13 +89,13 @@ export function requireUserFromHeaders(headers: IncomingHttpHeaders): User {
 }
 
 export function GetUser() {
-  return createParamDecorator((data: unknown, ctx: ExecutionContext) =>
+  return createParamDecorator((_, ctx: ExecutionContext) =>
     getUserFromHeaders(ctx.switchToHttp().getRequest().headers),
   )()
 }
 
 export function RequireUser() {
-  return createParamDecorator((data: unknown, ctx: ExecutionContext) =>
+  return createParamDecorator((_, ctx: ExecutionContext) =>
     requireUserFromHeaders(ctx.switchToHttp().getRequest().headers),
   )()
 }

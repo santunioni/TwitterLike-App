@@ -3,9 +3,14 @@ services:
     image: 'mysql:5.6'
     platform: linux/amd64
     environment:
-      MYSQL_ROOT_PASSWORD: realworld
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: realworld
       MYSQL_USER: realworld
       MYSQL_PASSWORD: realworld
     ports:
       - '3306:3306'
+    healthcheck:
+      test: '/usr/bin/mysql --user=root --password=root --execute "SHOW DATABASES;"'
+      timeout: 1s
+      retries: 60
+      interval: 1s

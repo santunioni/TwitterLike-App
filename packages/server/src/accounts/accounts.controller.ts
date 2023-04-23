@@ -1,10 +1,10 @@
-import { Controller, Injectable, Post, Req, UseGuards } from '@nestjs/common'
+import { Controller, HttpCode, HttpStatus, Injectable, Post, Req, UnauthorizedException } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiBasicAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
-import { User } from '../nest/jwt.guard'
 import { ZodBody } from '../nest/validation.utils'
+import { InvalidCredentialsError } from './accounts.exceptions'
 import { UsersService } from './accounts.service'
 
 const CreateUserDTO = z.object({
@@ -40,10 +40,32 @@ export class AccountsController {
     return this.service.getJWTResponse(user)
   }
 
-  @UseGuards(BasicAuthGuard)
+  /**
+   * Route protected by Basic Auth and return a JWT to be used in the Authorization header
+   * @param req
+   */
   @ApiBasicAuth()
   @Post('login')
-  login(@Req() req: { user: User }) {
-    return this.service.getJWTResponse(req.user)
+  @HttpCode(HttpStatus.CREATED)
+  async login(@Req() req: { headers?: { authorization?: string } }) {
+    try {
+      const [authMethod, basicAuthToken] = req.headers?.authorization?.split(' ') || []
+      if (authMethod?.toLowerCase() !== 'basic' || !basicAuthToken) {
+        throw new UnauthorizedException()
+      }
+      const [email, password] = Buffer.from(basicAuthToken, 'base64').toString().split(':')
+
+      const user = await this.service.getUserAccount({
+        email,
+        password,
+      })
+
+      return this.service.getJWTResponse(user)
+    } catch (error) {
+      if (error instanceof InvalidCredentialsError) {
+        throw new UnauthorizedException()
+      }
+      throw error
+    }
   }
 }

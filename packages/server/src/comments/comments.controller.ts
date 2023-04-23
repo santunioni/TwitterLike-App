@@ -7,13 +7,14 @@ import { slug } from '../articles/articles.controller'
 import { ArticlesService } from '../articles/articles.service'
 import { createAuthorDTO } from '../authors/authors.controller'
 import { AuthorsService, Profile } from '../authors/authors.service'
-import { GetUser, JWTAuthGuard, RequireUser, User } from '../nest/jwt.guard'
+import { GetUser, JWTAuthGuard, RequireUser } from '../nest/jwt.guard'
 import { Pagination, ZodPagination } from '../nest/pagination'
 import { buildUrlToPath } from '../nest/url'
 import { ZodBody, ZodQuery } from '../nest/validation.utils'
 import { TRPC } from '../trpc/app'
 import { Comment, CommentsRepository } from './comments.repository'
 
+import type { User } from '../nest/jwt.guard'
 const body = z.string().max(255).describe("The comment body. Example: 'I liked that article'")
 
 const CommentDTO = z.object({

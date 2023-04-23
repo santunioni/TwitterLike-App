@@ -1,3 +1,4 @@
+import { AccountsDriver } from './AccountsDSL'
 import { UserDriver } from './UserDriver'
 import { UserDSL } from './UserDSL'
 import { UserRestDriver } from './UserRestDriver'
@@ -8,7 +9,7 @@ const driverClasses = {
   rest: UserRestDriver,
 } as const
 
-function createDriver(): UserDriver {
+export function createDriver(): UserDriver {
   const DRIVER = process.env.DRIVER?.toLowerCase()
   const DriverClass = driverClasses[DRIVER as keyof typeof driverClasses]
   if (!DriverClass) {
@@ -17,15 +18,24 @@ function createDriver(): UserDriver {
   return new DriverClass()
 }
 
-export function createUsers() {
-  const context = {}
+export async function createAccounts() {
   const randomNumber = Date.now()
-  const abbott = new UserDSL(`Abbott-${randomNumber}`, createDriver(), context)
-  const costello = new UserDSL(`Costello-${randomNumber}`, createDriver(), context)
-  const guest = new UserDSL(`Guest-${randomNumber}`, createDriver(), context)
-  return {
-    abbott,
-    costello,
-    guest,
+  const accounts = new AccountsDriver()
+  await Promise.all([`Abbot-${randomNumber}`, `Costello-${randomNumber}`].map(username => accounts.upsert(username)))
+
+  return () => {
+    const ctx = {}
+
+    const abbott = new UserDSL(createDriver(), ctx, `Abbot-${randomNumber}`)
+    const costello = new UserDSL(createDriver(), ctx, `Costello-${randomNumber}`)
+    const guest = new UserDSL(createDriver(), ctx)
+
+    return {
+      abbott,
+      costello,
+      guest,
+    }
   }
 }
+
+export type CreateUsers = Awaited<ReturnType<typeof createAccounts>>

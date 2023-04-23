@@ -1,8 +1,13 @@
-import { createUsers } from './dsl/createUsers'
+import { createAccounts, CreateUsers } from './dsl/createUsers'
 import { UserDSL } from './dsl/UserDSL'
 
 let abbott: UserDSL
 let costello: UserDSL
+let createUsers: CreateUsers
+
+beforeAll(async () => {
+  createUsers = await createAccounts()
+})
 
 beforeEach(async () => {
   ;({ abbott, costello } = createUsers())

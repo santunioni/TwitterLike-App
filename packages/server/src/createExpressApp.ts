@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule } from '@nestjs/swagger'
 import * as trpcExpress from '@trpc/server/adapters/express'
+import * as cors from 'cors'
 import * as express from 'express'
 import { ArticlesController } from './articles/articles.controller'
 import { AuthorsController } from './authors/authors.controller'
@@ -31,6 +32,24 @@ export async function createExpressApp() {
   const { BASE_URL } = getEnvs()
   const nest = await createNestApplication(`${BASE_URL}/api`)
 
+  if (process.env.DEBUG) {
+    app.use((req, res, next) => {
+      console.log({
+        headers: JSON.parse(JSON.stringify(req.headers)),
+        method: req.method,
+        url: req.url,
+      })
+      next()
+    })
+    app.use(
+      cors({
+        origin: '*',
+      }),
+    )
+  } else {
+    app.use(cors())
+  }
+
   app.use('/api', nest.getHttpAdapter().getInstance())
 
   app.use(
@@ -38,9 +57,9 @@ export async function createExpressApp() {
     trpcExpress.createExpressMiddleware({
       createContext: createContext,
       router: createMergedTRPCApp(
-        nest.get(CommentsController),
-        nest.get(ArticlesController),
-        nest.get(AuthorsController),
+        nest.get(CommentsController) as CommentsController,
+        nest.get(ArticlesController) as ArticlesController,
+        nest.get(AuthorsController) as AuthorsController,
       ),
       onError: err => delete err.error.stack, // Don't expose internal failures to the World
     }),
