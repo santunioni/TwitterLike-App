@@ -1,6 +1,8 @@
 import type { AppRouter } from '@packages/server/src'
 import { httpBatchLink } from '@trpc/client'
 import { createTRPCNext } from '@trpc/next'
+import { inferReactQueryProcedureOptions } from '@trpc/react-query'
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 
 function getBaseUrl() {
   // if (typeof window !== 'undefined') {
@@ -29,6 +31,10 @@ function getToken() {
     .find(row => row.startsWith('token='))
     ?.split('=')[1]
 }
+
+export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>
+export type RouterInputs = inferRouterInputs<AppRouter>
+export type RouterOutputs = inferRouterOutputs<AppRouter>
 
 export const trpc = createTRPCNext<AppRouter>({
   config({ ctx }) {
