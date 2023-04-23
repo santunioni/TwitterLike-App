@@ -5,12 +5,12 @@ import { slugify } from './slugify'
 const lorem = new LoremIpsum()
 
 export function makeRandomArticle(article: Partial<Article & Tagged> = {}) {
-  const title = article?.title || lorem.generateSentences(1)
+  const title = article?.title ?? lorem.generateSentences(1)
   return {
     title: title,
     slug: slugify(title),
-    description: article?.description || lorem.generateSentences(2),
-    body: article?.body || lorem.generateParagraphs(1),
-    tags: [...new Set(article?.tags || lorem.generateWords(4).toLowerCase().split(' '))],
+    description: article?.description ?? lorem.generateSentences(2),
+    body: article?.body ?? lorem.generateParagraphs(1),
+    tags: [...new Set(article?.tags ?? lorem.generateWords(4).toLowerCase().split(' '))],
   }
 }

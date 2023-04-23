@@ -9,9 +9,10 @@
   "scripts": {
     "format": "prettier --write .",
     "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
-    "start:dev": "concurrently --kill-others \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
-    "start:watch": "concurrently --kill-others \"npm run start:watch --workspace packages/server\" \"npm run start:watch --workspace packages/client\""
+    "start:dev": "DEBUG=1 concurrently --kill-others \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
+    "start:watch": "DEBUG=1 concurrently --kill-others \"npm run start:watch --workspace packages/server\" \"npm run start:watch --workspace packages/client\""
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
@@ -21,8 +22,8 @@
     "@vercel/ncc": "^0.36.1",
     "concurrently": "^8.0.1",
     "eslint": "^8.39.0",
-    "eslint-config-prettier": "^8.8.0",
     "eslint-config-next": "13.3.1",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "jest": "^28.1.0",
     "node": "^18.15.0",

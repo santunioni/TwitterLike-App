@@ -2,10 +2,12 @@ import { Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseG
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
-import { AuthIsOptional, GetUser, JWTAuthGuard, RequireUser, User } from '../nest/jwt.guard'
+import type { User } from '../nest/jwt.guard'
+import { AuthIsOptional, GetUser, JWTAuthGuard, RequireUser } from '../nest/jwt.guard'
 import { buildUrlToPath } from '../nest/url'
 import { ZodBody } from '../nest/validation.utils'
 import { TRPC } from '../trpc/app'
+
 import { AuthorsService, Profile } from './authors.service'
 
 const username = z
@@ -130,7 +132,7 @@ export function createAuthorsTrpcRouter(controller: AuthorsController, trpc: TRP
       create: trpc.protectedProcedure
         .input(CreateProfileBody)
         .mutation(({ ctx, input }) => controller.create(ctx.user, input)),
-      get: trpc.protectedProcedure
+      get: trpc.publicProcedure
         .input(z.object({ username }))
         .query(({ ctx, input }) => controller.getProfile(ctx.user, input.username)),
       update: trpc.protectedProcedure

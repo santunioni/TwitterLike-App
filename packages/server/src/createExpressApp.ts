@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule } from '@nestjs/swagger'
 import * as trpcExpress from '@trpc/server/adapters/express'
+import * as cors from 'cors'
 import * as express from 'express'
 import { ArticlesController } from './articles/articles.controller'
 import { AuthorsController } from './authors/authors.controller'
@@ -30,6 +31,24 @@ export async function createExpressApp() {
 
   const { BASE_URL } = getEnvs()
   const nest = await createNestApplication(`${BASE_URL}/api`)
+
+  if (process.env.DEBUG) {
+    app.use((req, res, next) => {
+      console.log({
+        headers: JSON.parse(JSON.stringify(req.headers)),
+        method: req.method,
+        url: req.url,
+      })
+      next()
+    })
+    app.use(
+      cors({
+        origin: '*',
+      }),
+    )
+  } else {
+    app.use(cors())
+  }
 
   app.use('/api', nest.getHttpAdapter().getInstance())
 
