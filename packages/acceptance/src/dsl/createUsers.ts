@@ -1,6 +1,6 @@
 import { AccountsDriver } from './AccountsDSL'
-import { UserDSL } from './UserDSL'
 import { UserDriver } from './UserDriver'
+import { UserDSL } from './UserDSL'
 import { UserRestDriver } from './UserRestDriver'
 import { UserTrpcDriver } from './UserTrpcDriver'
 

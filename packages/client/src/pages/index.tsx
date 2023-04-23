@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import styles from '../styles/Home.module.css'
 import { ZodPagination } from '../utils/pagination'
-import { RouterOutputs, trpc } from '../utils/trpc'
+import { trpc } from '../utils/trpc'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,8 +15,7 @@ export default function Home() {
   const previousPage = page.getPreviousPage()
   const nextPage = page.getNextPage()
 
-  const articlesQuery = trpc.articles.getFeed.useQuery({ pagination: page.toParams() })
-    .data as RouterOutputs['articles']['getFeed']
+  const articlesQuery = trpc.articles.getFeed.useQuery({ pagination: page.toParams() }).data
   if (!articlesQuery) {
     return <div>Loading...</div>
   }

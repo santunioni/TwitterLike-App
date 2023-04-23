@@ -1,5 +1,5 @@
 import styles from '@packages/client/src/styles/Home.module.css'
-import { RouterOutputs, trpc } from '@packages/client/src/utils/trpc'
+import { trpc } from '@packages/client/src/utils/trpc'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
@@ -9,7 +9,7 @@ export default function ArticlePage() {
   if (!slug || Array.isArray(slug)) {
     return <div>Article {slug} unknown!</div>
   }
-  const articleQuery = trpc.articles.getOne.useQuery({ slug }).data as RouterOutputs['articles']['getOne']
+  const articleQuery = trpc.articles.getOne.useQuery({ slug }).data
   if (!articleQuery) {
     return <div>Loading...</div>
   }
