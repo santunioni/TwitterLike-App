@@ -11,8 +11,8 @@
     "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
-    "start:dev": "DEBUG=1 concurrently --kill-others \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
-    "start:watch": "DEBUG=1 concurrently --kill-others \"npm run start:watch --workspace packages/server\" \"npm run start:watch --workspace packages/client\""
+    "start:dev": "DEBUG=1 concurrently --kill-others --kill-others-on-fail \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
+    "start:watch": "DEBUG=1 concurrently --kill-others --kill-others-on-fail \"npm run start:watch --workspace packages/server\" \"npm run start:watch --workspace packages/client\""
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
