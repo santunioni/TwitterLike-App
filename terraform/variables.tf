@@ -22,7 +22,7 @@ variable "PSCALE_ORG_NAME" {
   default     = "santunioni"
 }
 
-data "external" "git" {
+data "external" "git_sha" {
   program = [
     "git",
     "log",

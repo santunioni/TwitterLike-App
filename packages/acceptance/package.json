@@ -9,9 +9,12 @@
   },
   "dependencies": {
     "@packages/server": "1.0.0",
-    "@trpc/client": "^10.20.0"
+    "@trpc/client": "^10.20.0",
+    "@trpc/server": "^10.20.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "lorem-ipsum": "^2.0.8"
+  },
   "jest": {
     "testEnvironment": "node",
     "moduleFileExtensions": [

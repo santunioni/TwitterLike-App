@@ -8,7 +8,3 @@ resource "aws_api_gateway_deployment" "stage_v1" {
     aws_api_gateway_integration.any_to_lambda
   ]
 }
-
-output "API_GATEWAY_URL" {
-  value = aws_api_gateway_deployment.stage_v1.invoke_url
-}

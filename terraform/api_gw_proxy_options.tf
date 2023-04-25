@@ -40,8 +40,14 @@ resource "aws_api_gateway_integration_response" "options" {
   status_code = aws_api_gateway_method_response.options.status_code
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'${join(",", local.CORS_ALLOWED_HEADERS)}'"
+    "method.response.header.Access-Control-Allow-Methods" = "'${join(",", local.CORS_ALLOWED_METHODS)}'"
   }
+}
+
+locals {
+  CORS_ALLOWED_ORIGINS = [aws_s3_bucket_website_configuration.website.website_domain]
+  CORS_ALLOWED_HEADERS = ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key", "X-Amz-Security-Token", "X-Amz-User-Agent"]
+  CORS_ALLOWED_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
 }

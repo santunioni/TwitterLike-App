@@ -1,40 +1,52 @@
-import type { AppRouter } from '@packages/server/src'
+import type { AppRouter } from '@packages/server/src/trpc/merged'
 import { httpBatchLink } from '@trpc/client'
 import { createTRPCNext } from '@trpc/next'
 import { inferReactQueryProcedureOptions } from '@trpc/react-query'
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 
-function getBaseUrl() {
-  // if (typeof window !== 'undefined') {
-  //   // browser should use relative path
-  //   console.log('Using browser')
-  //   return ''
-  // }
-  return 'http://localhost:3000'
+export function setGlobalToken(token: string | null) {
+  if (typeof window === 'undefined') {
+    return
+  }
+  if (token) {
+    localStorage.setItem('id_token', token)
+  } else {
+    localStorage.removeItem('id_token')
+  }
 }
 
-export function authenticate(token: string) {
-  const cookies = new Map<string, string>()
-  document.cookie.split(';').forEach(cookie => {
-    const [key, value] = cookie.trim().split('=')
-    cookies.set(key, value)
-  })
-  cookies.set('token', token)
-  document.cookie = Array.from(cookies.entries())
-    .map(([key, value]) => `${key}=${value}`)
-    .join('; ')
+export function decodeToken(token: string) {
+  const [, payload] = token.split('.')
+  return JSON.parse(Buffer.from(payload, 'base64').toString())
 }
 
-function getToken() {
-  return document.cookie
-    .split('; ')
-    .find(row => row.startsWith('token='))
-    ?.split('=')[1]
+function getGlobalToken() {
+  if (typeof window === 'undefined') {
+    return
+  }
+  const token = localStorage.getItem('id_token')
+  if (!token) {
+    return token
+  }
+  const { exp } = decodeToken(token)
+  if (Date.now() >= exp * 1000) {
+    localStorage.removeItem('id_token')
+    return null
+  }
+  return token
+}
+
+export function getCurrentUser() {
+  const token = getGlobalToken()
+  return token ? decodeToken(token) : null
 }
 
 export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>
 export type RouterInputs = inferRouterInputs<AppRouter>
 export type RouterOutputs = inferRouterOutputs<AppRouter>
+
+export type ArticleOutput = RouterOutputs['articles']['getOne']['article']
+export type ProfileOutput = RouterOutputs['profiles']['get']['profile']
 
 export const trpc = createTRPCNext<AppRouter>({
   config({ ctx }) {
@@ -45,9 +57,9 @@ export const trpc = createTRPCNext<AppRouter>({
            * If you want to use SSR, you need to use the server's full URL
            * @link https://trpc.io/docs/ssr
            **/
-          url: `${getBaseUrl()}/trpc`,
+          url: `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}/trpc`,
           headers: () => {
-            const token = getToken()
+            const token = getGlobalToken()
             return {
               ...ctx?.req?.headers,
               ...(token ? { authorization: `Bearer ${token}` } : {}),

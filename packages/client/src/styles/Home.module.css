@@ -219,3 +219,23 @@
     transform: rotate(0deg);
   }
 }
+
+.description {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.tags {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.tags li {
+  margin-right: 10px;
+  background-color: #f2f2f2;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 14px;
+}

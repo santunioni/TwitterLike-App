@@ -4,7 +4,7 @@ import { Article, ArticleSearchFields, UserDriver } from './UserDriver'
 
 export class UserRestDriver implements UserDriver {
   private axios = new Axios({
-    baseURL: process.env.API_URL || 'http://localhost:3000/api',
+    baseURL: `${process.env.API_BASE_URL || 'http://localhost:3000'}/api`,
     responseType: 'json',
     transformRequest: data => (data ? JSON.stringify(data) : data),
     transformResponse: data => (data ? JSON.parse(data) : data),

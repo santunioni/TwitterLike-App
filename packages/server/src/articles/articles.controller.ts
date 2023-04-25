@@ -4,13 +4,13 @@ import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import { createAuthorDTO } from '../authors/authors.controller'
 import { AuthorsService, Profile } from '../authors/authors.service'
+import type { User } from '../nest/jwt.guard'
 import { AuthIsOptional, GetUser, JWTAuthGuard, RequireUser } from '../nest/jwt.guard'
 import { Pagination, ZodPagination } from '../nest/pagination'
 import { buildUrlToPath } from '../nest/url'
 import { ZodBody, ZodQuery } from '../nest/validation.utils'
-
-import type { User } from '../nest/jwt.guard'
 import { TRPC } from '../trpc/app'
+import { ArticleFiltersDTO } from './articles.filters'
 import { Article, Dated, Sluged, Tagged } from './articles.models'
 import { ArticlesService } from './articles.service'
 
@@ -25,9 +25,7 @@ const description = z.string().describe('The article description. Example: "Tips
 
 const body = z.string().describe('The article body. Example: "Give it a lot a training and feed it with fish."')
 
-const tags = z
-  .union([z.array(z.string()), z.string().transform(tags => tags?.split(','))])
-  .describe('The article tags. Example: ["dragons", "training"]')
+const tags = z.array(z.string()).describe('The article tags. Example: ["dragons", "training"]')
 
 const article = z.object({ title, description, body, tags })
 
@@ -42,25 +40,6 @@ export const UpdateArticleDTO = z.object({
 })
 
 type UpdateArticleBody = z.infer<typeof UpdateArticleDTO>
-
-export const ArticleFiltersDTO = z
-  .object({
-    tags: tags.optional(),
-    author: z.string().optional().describe('The article author username'),
-    favorited: z.coerce.boolean().optional().describe('Whether the article is favorited by you'),
-  })
-  .transform(o => {
-    return {
-      ...o,
-      toParams: () => ({
-        ...(o.tags ? { tags: o.tags.join(',') } : {}),
-        ...(o.author ? { author: o.author } : {}),
-        ...(o.favorited ? { favorited: o.favorited.toString() } : {}),
-      }),
-    }
-  })
-
-type ArticleFiltersDTO = z.infer<typeof ArticleFiltersDTO>
 
 @ApiTags('articles')
 @ApiBearerAuth()

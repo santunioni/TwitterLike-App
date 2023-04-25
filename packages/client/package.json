@@ -6,7 +6,7 @@
     "dev": "next dev -p 3001",
     "start:dev": "next dev -p 3001",
     "start:watch": "next dev -p 3001",
-    "build": "next build",
+    "build": "next build && mv out/ ./../../build/client",
     "start": "next start -p 3001",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -23,7 +23,6 @@
     "@types/react-dom": "18.0.11",
     "next": "13.3.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "zod": "^3.21.4"
+    "react-dom": "18.2.0"
   }
 }

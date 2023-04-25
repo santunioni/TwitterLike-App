@@ -167,7 +167,7 @@ jobs:
 
       - id: terraform
         name: Deploy ${{ inputs.environment }}
-        working-directory: packages/server/terraform
+        working-directory: terraform
         run: |
           terraform init
           terraform workspace select -or-create ${{ inputs.environment }}
@@ -196,4 +196,4 @@ jobs:
         with:
           name: build
           path: |
-            packages/server/terraform/lambda.zip
+            terraform/lambda.zip

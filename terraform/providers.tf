@@ -13,6 +13,3 @@ terraform {
     key            = "realworld-app/server.tfstate"
   }
 }
-
-provider "aws" {
-}

@@ -1,4 +1,4 @@
-import type { AppRouter } from '@packages/server/src'
+import type { AppRouter } from '@packages/server'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 import type { HeadersEsque } from '@trpc/client/dist/internals/types'
 import axios, { AxiosResponse, AxiosResponseHeaders, RawAxiosResponseHeaders } from 'axios'
@@ -57,7 +57,7 @@ export class UserTrpcDriver implements UserDriver {
           })
           return convertAxiosResponseToFetchResponse(response)
         }, // Required because the default fetch implementation is only available on browsers.
-        url: process.env.TRPC_URL ?? 'http://localhost:3000/trpc',
+        url: `${process.env.API_BASE_URL || 'http://localhost:3000'}/trpc`,
         headers: () => {
           return {
             'Content-Type': 'application/json',

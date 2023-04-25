@@ -65,7 +65,7 @@ export class UserFollows extends BaseEntity {
   }
 
   private static async get(user: AuthorEntity, follows: AuthorEntity) {
-    return await UserFollows.createQueryBuilder().where({ userId: user.id, followsId: follows }).getOne()
+    return await UserFollows.createQueryBuilder().where({ userId: user.id, followsId: follows.id }).getOne()
   }
 
   public static async set(user: AuthorEntity, follows: AuthorEntity) {

@@ -1,0 +1,61 @@
+name: Terraform
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: 'The name of the environment to deploy to.'
+    outputs:
+      TF_OUTPUTS:
+        description: 'The outputs from terraform as JSON.'
+        value: ${{ jobs.terraform.outputs.TF_OUTPUTS }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./.github/actions/credentials
+
+      - name: Create DB Branch
+        uses: ./.github/actions/create_pscale_db_branch
+        with:
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ inputs.environment }}
+
+      - id: dburl
+        name: Create DB Branch Password
+        uses: ./.github/actions/create_pscale_db_branch_password
+        with:
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ inputs.environment }}
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.4
+          terraform_wrapper: false
+
+      - name: Terraform init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Create Workspace
+        working-directory: terraform
+        if: inputs.environment != 'main'
+        run: terraform workspace select -or-create ${{ inputs.environment }}
+
+      - id: terraform
+        name: Deploy ${{ inputs.environment }}
+        working-directory: terraform
+        run: |
+          terraform apply -auto-approve
+          echo "TF_OUTPUTS=$(terraform output -json | jq tostring)" >> $GITHUB_OUTPUT
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+
+    outputs:
+      TF_OUTPUTS: ${{ steps.terraform.outputs.TF_OUTPUTS }}

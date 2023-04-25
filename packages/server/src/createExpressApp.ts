@@ -29,7 +29,7 @@ export async function createNestApplication(baseApiUrl: string) {
 export async function createExpressApp() {
   const app = express()
 
-  const { BASE_URL } = getEnvs()
+  const { BASE_URL, CORS_ALLOWED_ORIGINS, CORS_ALLOWED_METHODS, CORS_ALLOWED_HEADERS } = getEnvs()
   const nest = await createNestApplication(`${BASE_URL}/api`)
 
   if (process.env.DEBUG) {
@@ -41,14 +41,16 @@ export async function createExpressApp() {
       })
       next()
     })
-    app.use(
-      cors({
-        origin: '*',
-      }),
-    )
-  } else {
-    app.use(cors())
   }
+
+  app.use(
+    cors({
+      origin: CORS_ALLOWED_ORIGINS.split(','),
+      allowedHeaders: CORS_ALLOWED_HEADERS.split(','),
+      methods: CORS_ALLOWED_METHODS.split(','),
+      maxAge: 86400,
+    }),
+  )
 
   app.use('/api', nest.getHttpAdapter().getInstance())
 

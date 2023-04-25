@@ -9,6 +9,7 @@
   "scripts": {
     "format": "prettier --write .",
     "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
+    "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
     "start:dev": "DEBUG=1 concurrently --kill-others --kill-others-on-fail \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
@@ -44,5 +45,8 @@
     "bracketSameLine": true,
     "arrowParens": "avoid",
     "printWidth": 120
+  },
+  "dependencies": {
+    "zod": "^3.21.4"
   }
 }
