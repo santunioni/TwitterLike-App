@@ -44,7 +44,7 @@ resource "aws_lambda_function" "realworld_api_function" {
   function_name    = local.NAME
   role             = aws_iam_role.realworld_api_function_role.arn
   filename         = data.archive_file.dummy.output_path
-  source_code_hash = filebase64sha256(data.archive_file.dummy.output_path)
+  source_code_hash = "DONT CHANGE. Changing will deploy the empty lambda function to production."
   tags             = local.COMMON_TAGS
   provider         = aws
   environment {
