@@ -62,6 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: mysql://app:app@localhost:3306/app
+      API_BASE_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v3
 
@@ -101,9 +102,6 @@ jobs:
       - run: npm run test --workspace packages/acceptance
         shell: bash
         name: Acceptance Tests
-        env:
-          API_URL: http://localhost:3000/api
-          TRPC_URL: http://localhost:3000/trpc
 
   lambda:
     name: Lambda Tests
@@ -122,23 +120,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: ./.github/actions/credentials
-
-      - name: Create DB Branch
-        uses: ./.github/actions/create_pscale_db_branch
-        with:
-          db_name: ${{ env.DB_NAME }}
-          org_name: ${{ env.ORG_NAME }}
-          branch_name: ${{ inputs.environment }}
-
-      - id: dburl
-        name: Create DB Branch Password
-        uses: ./.github/actions/create_pscale_db_branch_password
-        with:
-          db_name: ${{ env.DB_NAME }}
-          org_name: ${{ env.ORG_NAME }}
-          branch_name: ${{ inputs.environment }}
-
       - uses: actions/setup-node@v3
         with:
           cache: 'npm'
@@ -147,53 +128,29 @@ jobs:
             package-lock.json
             packages/*/package.json
 
-      - uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.4.4
-          terraform_wrapper: false
+      - uses: ./.github/actions/infrastructure  # Will set the Env Vars at outputs /terraform/outputs.tf
 
-      - run: npm install
+      - name: Dependencies
         shell: bash
-        name: Dependencies
+        run: npm install
 
       - run: npm run migration:run --workspace packages/server
         shell: bash
         name: Migrations
-        env:
-          DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
-      - run: npm run --workspace packages/server build:lambda
-        name: Build Lambda
+      - name: Build
+        shell: bash
+        run: npm run build --workspaces --if-present
 
-      - id: terraform
-        name: Deploy ${{ inputs.environment }}
-        working-directory: terraform
-        run: |
-          terraform init
-          terraform workspace select -or-create ${{ inputs.environment }}
-          terraform refresh
-          terraform apply -auto-approve
-          echo "API_GATEWAY_URL=$(terraform output API_GATEWAY_URL | jq -r)" >> $GITHUB_OUTPUT
-        env:
-          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+      - name: Deploy
+        shell: bash
+        run: npm run deploy --workspaces --if-present
 
       - name: Wait ${{ inputs.environment }}
         run: |
-          ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/checks/readiness" 200
-          ./scripts/wait_for_status.sh "$API_GATEWAY_URL/api/articles" 200
-        env:
-          API_GATEWAY_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}
+          ./scripts/wait_for_status.sh "$API_BASE_URL/api/checks/readiness" 200
+          ./scripts/wait_for_status.sh "$API_BASE_URL/api/articles" 200
 
       - run: npm run test --workspace packages/acceptance
         shell: bash
         name: Acceptance Tests
-        env:
-          API_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/api
-          TRPC_URL: ${{ steps.terraform.outputs.API_GATEWAY_URL }}/trpc
-
-      - name: Uploading Build
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: |
-            terraform/lambda.zip

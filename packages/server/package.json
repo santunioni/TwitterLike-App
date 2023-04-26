@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "ncc build src/lambda.ts --minify --out build/lambda && cd build/lambda && zip -r ../../../../build/server.zip * && cd - && rm -rf build/lambda",
+    "build": "ncc build src/lambda.ts --minify --out build/lambda && cd build/lambda && zip -r ../../lambda.zip * && cd - && rm -rf build/lambda",
+    "deploy": "aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://lambda.zip",
     "build:nest": "ncc build src/server.ts --minify --out build/server",
     "start:dev": "NODE_ENV=development nest start --debug",
     "start:watch": "NODE_ENV=development nest start --debug --watch",

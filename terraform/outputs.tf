@@ -6,12 +6,8 @@ output "API_BASE_URL" {
   value = aws_api_gateway_deployment.stage_v1.invoke_url
 }
 
-output "NEXT_PUBLIC_API_BASE_URL" {
-  value = aws_api_gateway_deployment.stage_v1.invoke_url
-}
-
-output "WEBSITE_DESTINATION" {
-  value = "s3://${aws_s3_bucket_website_configuration.website.bucket}/"
+output "WEBSITE_BUCKET" {
+  value = aws_s3_bucket_website_configuration.website.bucket
 }
 
 output "WEBSITE_ENDPOINT" {
