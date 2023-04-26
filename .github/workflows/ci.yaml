@@ -129,6 +129,8 @@ jobs:
             packages/*/package.json
 
       - uses: ./.github/actions/infrastructure # Will set the Env Vars at outputs /terraform/outputs.tf
+        with:
+          environment: ${{ inputs.environment }}
 
       - name: Dependencies
         shell: bash
@@ -140,11 +142,11 @@ jobs:
 
       - name: Build
         shell: bash
-        run: npm run build --workspaces --if-present
+        run: npm run build
 
       - name: Deploy
         shell: bash
-        run: npm run deploy --workspaces --if-present
+        run: npm run deploy
 
       - name: Wait ${{ inputs.environment }}
         run: |

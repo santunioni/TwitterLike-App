@@ -10,6 +10,7 @@
     "format": "prettier --write . && cd terraform && terraform fmt && cd -",
     "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
     "build": "npm run build --workspaces --if-present",
+    "deploy": "npm run deploy --workspace --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
     "start:dev": "DEBUG=1 concurrently --kill-others --kill-others-on-fail \"npm run start:dev --workspace packages/server\" \"npm run start:dev --workspace packages/client\"",
