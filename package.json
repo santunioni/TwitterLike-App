@@ -7,7 +7,7 @@
     "node": "18"
   },
   "scripts": {
-    "format": "prettier --write .",
+    "format": "prettier --write . && cd terraform && terraform fmt && cd -",
     "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

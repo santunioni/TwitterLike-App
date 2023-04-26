@@ -128,7 +128,7 @@ jobs:
             package-lock.json
             packages/*/package.json
 
-      - uses: ./.github/actions/infrastructure  # Will set the Env Vars at outputs /terraform/outputs.tf
+      - uses: ./.github/actions/infrastructure # Will set the Env Vars at outputs /terraform/outputs.tf
 
       - name: Dependencies
         shell: bash
