@@ -5,7 +5,7 @@ function readEnvs() {
   const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000'
   const VERSION = process.env.VERSION ?? '0.0.0'
   const DATABASE_URL = process.env.DATABASE_URL
-  const CORS_ALLOWED_ORIGINS = process.env.CORS_ALLOWED_ORIGINS ?? '*'
+  const CORS_ALLOWED_ORIGINS = process.env.CORS_ALLOWED_ORIGINS ?? 'http://localhost:3001'
   const CORS_ALLOWED_HEADERS = process.env.CORS_ALLOWED_HEADERS ?? 'Content-Type,Authorization'
   const CORS_ALLOWED_METHODS = process.env.CORS_ALLOWED_METHODS ?? 'GET,POST,PUT,DELETE,PATCH,OPTIONS'
   return {

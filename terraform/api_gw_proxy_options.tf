@@ -40,14 +40,15 @@ resource "aws_api_gateway_integration_response" "options" {
   status_code = aws_api_gateway_method_response.options.status_code
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
-    "method.response.header.Access-Control-Allow-Headers" = "'${join(",", local.CORS_ALLOWED_HEADERS)}'"
-    "method.response.header.Access-Control-Allow-Methods" = "'${join(",", local.CORS_ALLOWED_METHODS)}'"
+    "method.response.header.Access-Control-Allow-Origin"      = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
+    "method.response.header.Access-Control-Allow-Headers"     = "'${join(",", local.CORS_ALLOWED_HEADERS)}'"
+    "method.response.header.Access-Control-Allow-Methods"     = "'${join(",", local.CORS_ALLOWED_METHODS)}'"
+    "method.response.header.Access-Control-Allow-Credentials" = "'true'"
   }
 }
 
 locals {
-  CORS_ALLOWED_ORIGINS = ["*"]
-  CORS_ALLOWED_HEADERS = ["*"]
-  CORS_ALLOWED_METHODS = ["*"]
+  CORS_ALLOWED_ORIGINS = [local.WEBSITE_URL, "${local.WEBSITE_URL}:80"]
+  CORS_ALLOWED_HEADERS = ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key", "X-Amz-Security-Token"]
+  CORS_ALLOWED_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
 }

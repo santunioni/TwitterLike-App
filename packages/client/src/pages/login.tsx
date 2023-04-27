@@ -1,4 +1,4 @@
-import { getCurrentUser, setGlobalToken } from '@packages/client/src/utils/trpc'
+import { getApiBaseUrl, getCurrentUser, setGlobalToken } from '@packages/client/src/utils/trpc'
 import Link from 'next/link'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -14,11 +14,12 @@ export default function Login() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    const fetchReturn = await fetch('http://localhost:3000/api/accounts/login', {
+    const fetchReturn = await fetch(`${getApiBaseUrl()}/api/accounts/login`, {
       method: 'POST',
       headers: {
         authorization: `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`,
       },
+      credentials: 'include',
     })
     const { access_token } = await fetchReturn.json()
     if (fetchReturn.status === 401) {

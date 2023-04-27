@@ -4,6 +4,10 @@ import { createTRPCNext } from '@trpc/next'
 import { inferReactQueryProcedureOptions } from '@trpc/react-query'
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 
+export function getApiBaseUrl() {
+  return process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'
+}
+
 export function setGlobalToken(token: string | null) {
   if (typeof window === 'undefined') {
     return
@@ -57,7 +61,7 @@ export const trpc = createTRPCNext<AppRouter>({
            * If you want to use SSR, you need to use the server's full URL
            * @link https://trpc.io/docs/ssr
            **/
-          url: `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000'}/trpc`,
+          url: `${getApiBaseUrl()}/trpc`,
           headers: () => {
             const token = getGlobalToken()
             return {

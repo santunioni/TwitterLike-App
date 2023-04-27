@@ -30,6 +30,7 @@ export async function createExpressApp() {
   const app = express()
 
   const { BASE_URL, CORS_ALLOWED_ORIGINS, CORS_ALLOWED_METHODS, CORS_ALLOWED_HEADERS } = getEnvs()
+
   const nest = await createNestApplication(`${BASE_URL}/api`)
 
   if (process.env.DEBUG) {
@@ -48,6 +49,7 @@ export async function createExpressApp() {
       origin: CORS_ALLOWED_ORIGINS.split(','),
       allowedHeaders: CORS_ALLOWED_HEADERS.split(','),
       methods: CORS_ALLOWED_METHODS.split(','),
+      credentials: true,
       maxAge: 86400,
     }),
   )
