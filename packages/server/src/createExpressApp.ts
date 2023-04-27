@@ -44,15 +44,15 @@ export async function createExpressApp() {
     })
   }
 
-  app.use(
-    cors({
-      origin: CORS_ALLOWED_ORIGINS.split(','),
-      allowedHeaders: CORS_ALLOWED_HEADERS.split(','),
-      methods: CORS_ALLOWED_METHODS.split(','),
-      credentials: true,
-      maxAge: 86400,
-    }),
-  )
+  const corsOptions = {
+    origin: CORS_ALLOWED_ORIGINS.split(','),
+    allowedHeaders: CORS_ALLOWED_HEADERS.split(','),
+    methods: CORS_ALLOWED_METHODS.split(','),
+    credentials: true,
+    maxAge: 86400,
+  } as const
+
+  app.use(cors(corsOptions))
 
   app.use('/api', nest.getHttpAdapter().getInstance())
 
@@ -69,5 +69,5 @@ export async function createExpressApp() {
     }),
   )
 
-  return app
+  return { app, corsOptions }
 }
