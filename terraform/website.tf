@@ -41,3 +41,7 @@ resource "aws_s3_bucket_website_configuration" "website" {
     key = "404.html"
   }
 }
+
+locals {
+  WEBSITE_URL = "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
+}

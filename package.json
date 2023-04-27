@@ -8,7 +8,8 @@
   },
   "scripts": {
     "format": "prettier --write . && cd terraform && terraform fmt && cd -",
-    "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server && docker-compose logs -f",
+    "infra": "docker-compose up -d --wait && npm run migration:run --workspace packages/server",
+    "infra:logs": "npm run infra && docker-compose logs -f",
     "build": "npm run build --workspaces --if-present",
     "deploy": "npm run deploy --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

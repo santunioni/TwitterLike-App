@@ -11,7 +11,7 @@ output "WEBSITE_BUCKET" {
 }
 
 output "WEBSITE_ENDPOINT" {
-  value = "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
+  value = local.WEBSITE_URL
 }
 
 output "DATABASE_URL" {

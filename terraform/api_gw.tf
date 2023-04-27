@@ -6,3 +6,7 @@ resource "aws_api_gateway_rest_api" "api" {
   minimum_compression_size = 0
   tags                     = local.COMMON_TAGS
 }
+
+locals {
+  API_GATEWAY_DOMAIN = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${data.aws_region.current}.amazonaws.com/"
+}
