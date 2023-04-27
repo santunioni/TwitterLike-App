@@ -32,11 +32,11 @@ export const handler: Handler = async (event: APIGatewayProxyEvent, context: Con
 
   const response = await serverlessExpress.proxy(lambdaProxyServer, event, context, 'PROMISE').promise
 
-  response.headers['access-control-allow-origin'] = allowedOrigins
-  response.headers['access-control-allow-credentials'] = cors.credentials
-  response.headers['access-control-allow-methods'] = allowedMethods
-  response.headers['access-control-allow-headers'] = allowedHeaders
-  response.headers['access-control-max-age'] = cors.maxAge
+  response.headers['Access-Control-Allow-Origin'] = allowedOrigins
+  response.headers['Access-Control-Allow-Credentials'] = cors.credentials
+  response.headers['Access-Control-Allow-Methods'] = allowedMethods
+  response.headers['Access-Control-Allow-Headers'] = allowedHeaders
+  response.headers['Access-Control-Max-Age'] = cors.maxAge
 
   console.log({ event, response })
 
