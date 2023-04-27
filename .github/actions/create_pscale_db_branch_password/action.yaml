@@ -57,7 +57,7 @@ runs:
         fi
 
         raw_db_url=$(pscale password create "$DB_NAME" "$BRANCH_NAME" "$PASSWORD_NAME" --org "$ORG_NAME" --format json)
-        DATABASE_URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/$DB_NAME?ssl={\"rejectUnauthorized\":true}\"")
+        DATABASE_URL=$(echo "$raw_db_url" |  jq -r ". | \"mysql://\" + .username +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/$DB_NAME?ssl={\\"rejectUnauthorized\\":true}\"")
         aws ssm put-parameter --name "$URL_PATH" --value "$DATABASE_URL" --type SecureString --overwrite
 
         echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
