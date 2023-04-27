@@ -50,28 +50,28 @@ locals {
   CORS_ALLOWED_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
 }
 
-resource "aws_api_gateway_gateway_response" "response_4xx" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  response_type = "DEFAULT_4XX"
-
-  response_templates = {
-    "application/json" = "{'message':$context.error.messageString}"
-  }
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
-  }
-}
-
-resource "aws_api_gateway_gateway_response" "response_5xx" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  response_type = "DEFAULT_5XX"
-
-  response_templates = {
-    "application/json" = "{'message':$context.error.messageString}"
-  }
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
-  }
-}
+#resource "aws_api_gateway_gateway_response" "response_4xx" {
+#  rest_api_id   = aws_api_gateway_rest_api.api.id
+#  response_type = "DEFAULT_4XX"
+#
+#  response_templates = {
+#    "application/json" = "{'message':$context.error.messageString}"
+#  }
+#
+#  response_parameters = {
+#    "method.response.header.Access-Control-Allow-Origin" = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
+#  }
+#}
+#
+#resource "aws_api_gateway_gateway_response" "response_5xx" {
+#  rest_api_id   = aws_api_gateway_rest_api.api.id
+#  response_type = "DEFAULT_5XX"
+#
+#  response_templates = {
+#    "application/json" = "{'message':$context.error.messageString}"
+#  }
+#
+#  response_parameters = {
+#    "method.response.header.Access-Control-Allow-Origin" = "'${join(",", local.CORS_ALLOWED_ORIGINS)}'"
+#  }
+#}

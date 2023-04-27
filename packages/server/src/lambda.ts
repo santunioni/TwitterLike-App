@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, Context } from 'aws-lambda'
+import { APIGatewayProxyEvent, Context, Handler } from 'aws-lambda'
 import * as serverlessExpress from 'aws-serverless-express'
 import { Server } from 'http'
 import { createExpressApp } from './createExpressApp'
@@ -10,7 +10,7 @@ const allowedOrigins = new Set<string>()
 let allowedMethods = ''
 let allowedHeaders = ''
 
-export async function handler(event: APIGatewayProxyEvent, context: Context) {
+export const handler: Handler = async (event: APIGatewayProxyEvent, context: Context, callback) => {
   if (!lambdaProxyServer) {
     const { app, corsOptions } = await createExpressApp()
     cors = corsOptions
@@ -19,7 +19,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context) {
     allowedMethods = corsOptions.methods.join(',')
     allowedHeaders = corsOptions.allowedHeaders.join(',')
 
-    lambdaProxyServer = serverlessExpress.createServer(app, undefined, [
+    lambdaProxyServer = serverlessExpress.createServer(app, callback, [
       'application/octet-stream',
       'font/eot',
       'font/opentype',
