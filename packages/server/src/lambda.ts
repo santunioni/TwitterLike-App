@@ -18,5 +18,7 @@ export async function handler(event: any, context: Context) {
       'image/svg+xml',
     ])
   }
-  return await serverlessExpress.proxy(lambdaProxyServer, event, context, 'PROMISE').promise
+  const response = await serverlessExpress.proxy(lambdaProxyServer, event, context, 'PROMISE').promise
+  console.log({ event, response })
+  return response
 }
