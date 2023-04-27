@@ -10,11 +10,6 @@ description: Create the PlanetScale and AWS Infrastructure
 runs:
   using: composite
   steps:
-    - uses: aws-actions/configure-aws-credentials@v1
-      with:
-        role-to-assume: arn:aws:iam::814320462898:role/iac
-        aws-region: us-east-1
-
     - name: Create DB Branch
       uses: ./.github/actions/create_pscale_db_branch
       with:
