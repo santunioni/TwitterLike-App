@@ -65,6 +65,12 @@ export const trpc = createTRPCNext<AppRouter>({
               ...(token ? { authorization: `Bearer ${token}` } : {}),
             }
           },
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: 'include',
+            })
+          },
         }),
       ],
     }
