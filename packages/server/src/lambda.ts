@@ -10,7 +10,7 @@ let allowedMethods = ''
 let allowedHeaders = ''
 let allowedOrigins = ''
 
-export const handler: Handler = async (event: APIGatewayProxyEvent, context: Context, callback) => {
+export const handler: Handler = async (event: APIGatewayProxyEvent, context: Context) => {
   if (!lambdaProxyServer) {
     const { app, corsOptions } = await createExpressApp()
     cors = corsOptions
@@ -19,7 +19,7 @@ export const handler: Handler = async (event: APIGatewayProxyEvent, context: Con
     allowedHeaders = corsOptions.allowedHeaders.join(',')
     allowedOrigins = corsOptions.origin.join(',')
 
-    lambdaProxyServer = serverlessExpress.createServer(app, callback, [
+    lambdaProxyServer = serverlessExpress.createServer(app, undefined, [
       'application/octet-stream',
       'font/eot',
       'font/opentype',
