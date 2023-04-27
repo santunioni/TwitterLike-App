@@ -40,6 +40,7 @@ locals {
     Environment = local.ENVIRONMENT
     RepoLink    = "https://github.com/santunioni/realworld-app"
   }
-  NAME     = "realworld-api-${local.ENVIRONMENT}"
-  BASE_URL = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${var.STAGE_NAME}"
+  NAME               = "realworld-api-${local.ENVIRONMENT}"
+  API_GATEWAY_DOMAIN = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com"
+  BASE_URL           = "${local.API_GATEWAY_DOMAIN}/${var.STAGE_NAME}"
 }
