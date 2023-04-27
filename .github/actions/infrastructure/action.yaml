@@ -34,12 +34,16 @@ runs:
       working-directory: terraform
       shell: bash
       run: terraform init
+      env:
+        TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
     - name: Create Workspace
       working-directory: terraform
       shell: bash
       if: inputs.environment != 'main'
       run: terraform workspace select -or-create ${{ inputs.environment }}
+      env:
+        TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
     - id: terraform
       name: Deploy ${{ inputs.environment }}
@@ -48,4 +52,6 @@ runs:
       run: |
         terraform apply -auto-approve
         terraform output -json | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"' >> $GITHUB_ENV
+      env:
+        TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
       # Check outputs at /terraform/outputs.tf
