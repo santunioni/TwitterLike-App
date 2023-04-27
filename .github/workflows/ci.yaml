@@ -91,12 +91,12 @@ jobs:
       - name: Building Application
         shell: bash
         run: |
-          npm run --workspace packages/server build:server
+          npm run --workspace packages/server nest:build
 
       - name: Starting localhost server
         shell: bash
         run: |
-          nohup sh -c 'npm run build:server:start --workspace packages/server' &
+          nohup sh -c 'npm run nest:start --workspace packages/server' &
           ./scripts/wait_for_status.sh http://localhost:3000/api/checks/readiness 200
 
       - run: npm run test --workspace packages/acceptance
