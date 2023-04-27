@@ -6,20 +6,12 @@ import { createExpressApp } from './createExpressApp'
 let lambdaProxyServer: Server
 let cors: Awaited<ReturnType<typeof createExpressApp>>['corsOptions']
 
-const allowedOrigins = new Set<string>()
-let allowedMethods = ''
-let allowedHeaders = ''
-
-export const handler: Handler = async (event: APIGatewayProxyEvent, context: Context, callback) => {
+export const handler: Handler = async (event: APIGatewayProxyEvent, context: Context) => {
   if (!lambdaProxyServer) {
     const { app, corsOptions } = await createExpressApp()
     cors = corsOptions
 
-    corsOptions.origin.forEach(origin => allowedOrigins.add(origin))
-    allowedMethods = corsOptions.methods.join(',')
-    allowedHeaders = corsOptions.allowedHeaders.join(',')
-
-    lambdaProxyServer = serverlessExpress.createServer(app, callback, [
+    lambdaProxyServer = serverlessExpress.createServer(app, undefined, [
       'application/octet-stream',
       'font/eot',
       'font/opentype',
@@ -32,13 +24,11 @@ export const handler: Handler = async (event: APIGatewayProxyEvent, context: Con
 
   const response = await serverlessExpress.proxy(lambdaProxyServer, event, context, 'PROMISE').promise
 
-  if (event.headers.Origin && allowedOrigins.has(event.headers.Origin)) {
-    response.headers['Access-Control-Allow-Origin'] = event.headers.Origin
-    response.headers['Access-Control-Allow-Credentials'] = cors.credentials
-    response.headers['Access-Control-Allow-Methods'] = allowedMethods
-    response.headers['Access-Control-Allow-Headers'] = allowedHeaders
-    response.headers['Access-Control-Max-Age'] = cors.maxAge
-  }
+  response.headers['Access-Control-Allow-Origin'] = cors.origin
+  response.headers['Access-Control-Allow-Credentials'] = cors.credentials
+  response.headers['Access-Control-Allow-Methods'] = cors.methods
+  response.headers['Access-Control-Allow-Headers'] = cors.allowedHeaders
+  response.headers['Access-Control-Max-Age'] = cors.maxAge
 
   console.log({ event, response })
 
