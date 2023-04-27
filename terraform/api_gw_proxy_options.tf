@@ -47,7 +47,7 @@ resource "aws_api_gateway_integration_response" "options" {
 }
 
 locals {
-  CORS_ALLOWED_ORIGINS = [local.WEBSITE_URL, local.API_GATEWAY_DOMAIN]
-  CORS_ALLOWED_HEADERS = ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key", "X-Amz-Security-Token", "X-Amz-User-Agent"]
-  CORS_ALLOWED_METHODS = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+  CORS_ALLOWED_ORIGINS = ["*"]
+  CORS_ALLOWED_HEADERS = ["*"]
+  CORS_ALLOWED_METHODS = ["*"]
 }
