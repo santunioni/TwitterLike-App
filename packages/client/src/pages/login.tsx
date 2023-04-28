@@ -14,10 +14,11 @@ export default function Login() {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    const basicAuthToken = Buffer.from(`${email}:${password}`).toString('base64')
     const fetchReturn = await fetch(`${getApiBaseUrl()}/api/accounts/login`, {
       method: 'POST',
       headers: {
-        authorization: `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`,
+        authorization: `Basic ${basicAuthToken}`,
       },
       credentials: 'include',
     })

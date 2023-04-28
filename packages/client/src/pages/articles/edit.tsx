@@ -83,9 +83,8 @@ function ArticleEdit({ slug }: { slug: string }) {
 
 export default function ArticleEditPage() {
   const { slug } = useRouter().query
-  const Back = () => <a href={'/feed'}>Back</a>
   if (!slug || Array.isArray(slug)) {
-    return <Back />
+    return <a href={'/feed'}>Back</a>
   }
   return <ArticleEdit slug={slug} />
 }

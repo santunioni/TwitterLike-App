@@ -7,10 +7,8 @@ export default function ArticlePage() {
   const router = useRouter()
   const { slug } = router.query
 
-  const Back = () => <a href={'/feed'}>Back</a>
-
   if (!slug || Array.isArray(slug)) {
-    return <Back />
+    return <a href={'/feed'}>Back</a>
   }
 
   return (
@@ -24,7 +22,7 @@ export default function ArticlePage() {
       <main>
         <Link href={'/'}>Início</Link>
         <ArticleWithComments slug={slug} />
-        <Back />
+        <a href={'/feed'}>Back</a>
       </main>
     </>
   )
