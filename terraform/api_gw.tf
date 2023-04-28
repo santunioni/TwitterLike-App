@@ -6,7 +6,3 @@ resource "aws_api_gateway_rest_api" "api" {
   minimum_compression_size = 0
   tags                     = local.COMMON_TAGS
 }
-
-output "API_GATEWAY_ID" {
-  value = aws_api_gateway_rest_api.api.id
-}

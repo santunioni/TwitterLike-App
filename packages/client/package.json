@@ -7,6 +7,7 @@
     "start:dev": "next dev -p 3001",
     "start:watch": "next dev -p 3001",
     "build": "next build",
+    "deploy": "aws s3 sync ./out/ s3://$WEBSITE_BUCKET/ --delete",
     "start": "next start -p 3001",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -23,7 +24,6 @@
     "@types/react-dom": "18.0.11",
     "next": "13.3.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "zod": "^3.21.4"
+    "react-dom": "18.2.0"
   }
 }

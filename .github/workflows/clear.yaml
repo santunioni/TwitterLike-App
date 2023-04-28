@@ -37,7 +37,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Destroy
-        working-directory: packages/server/terraform
+        working-directory: terraform
         run: |
           touch lambda.zip
           terraform init

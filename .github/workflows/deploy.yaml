@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      TF_OUTPUTS:
+        description: 'The outputs from terraform as JSON.'
+        required: true
+        type: string
+      environment:
+        description: 'The name of the environment to deploy to.'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set Env Vars
+        run: echo ${{ inputs.TF_OUTPUTS }} | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"' >> $GITHUB_ENV
+
+      - uses: ./.github/actions/credentials
+
+      - run: npm install
+        shell: bash
+        name: Dependencies
+
+      - run: npm run migration:run --workspace packages/server
+        shell: bash
+        name: Migrations
+
+      - run: npm run --workspace packages/server build:lambda
+        name: Build Lambda
+
+      - name: Wait ${{ inputs.environment }}
+        run: |
+          ./scripts/wait_for_status.sh "$API_URL/api/checks/readiness" 200
+          ./scripts/wait_for_status.sh "$API_URL/api/articles" 200
+
+      - run: npm run test --workspace packages/acceptance
+        shell: bash
+        name: Acceptance Tests
+
+      - name: Uploading Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: |
+            terraform/lambda.zip

@@ -19,15 +19,14 @@ export function createDriver(): UserDriver {
 }
 
 export async function createAccounts() {
-  const randomNumber = Date.now()
   const accounts = new AccountsDriver()
-  await Promise.all([`Abbot-${randomNumber}`, `Costello-${randomNumber}`].map(username => accounts.upsert(username)))
+  await Promise.all(['abbott', 'costello'].map(username => accounts.upsert(username)))
 
   return () => {
     const ctx = {}
 
-    const abbott = new UserDSL(createDriver(), ctx, `Abbot-${randomNumber}`)
-    const costello = new UserDSL(createDriver(), ctx, `Costello-${randomNumber}`)
+    const abbott = new UserDSL(createDriver(), ctx, 'abbott')
+    const costello = new UserDSL(createDriver(), ctx, 'costello')
     const guest = new UserDSL(createDriver(), ctx)
 
     return {

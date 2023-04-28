@@ -3,7 +3,7 @@ import { getEnvs } from './environment'
 
 export async function bootstrapServer(): Promise<void> {
   const { API_PORT } = getEnvs()
-  const app = await createExpressApp()
+  const { app } = await createExpressApp()
   await app.listen(API_PORT)
 }
 

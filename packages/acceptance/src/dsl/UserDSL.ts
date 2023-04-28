@@ -1,5 +1,6 @@
-import { makeRandomArticle } from '@packages/server/src'
+import { LoremIpsum } from 'lorem-ipsum'
 import { ArticleSearchFields, PartialArticle, UserDriver } from './UserDriver'
+const lorem = new LoremIpsum()
 
 export class UserDSL {
   constructor(
@@ -38,7 +39,12 @@ export class UserDSL {
 
   async writeArticle(article: PartialArticle = {}) {
     this.context.slug = await this.driver.writeArticle({
-      ...makeRandomArticle(),
+      ...{
+        title: lorem.generateSentences(1),
+        description: lorem.generateSentences(2),
+        body: lorem.generateParagraphs(1),
+        tags: lorem.generateWords(4).toLowerCase().split(' '),
+      },
       ...article,
     })
   }
@@ -56,6 +62,7 @@ export class UserDSL {
   }
 
   async commentOnArticle(slug?: string, comment?: string) {
+    console.log('Commenting on', slug || this.slug)
     await this.driver.commentOnArticle(slug || this.slug, comment || 'I liked that article!')
   }
 

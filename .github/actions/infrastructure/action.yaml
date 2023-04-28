@@ -1,0 +1,57 @@
+name: Infrastructure
+
+inputs:
+  environment:
+    required: true
+    description: 'The name of the environment to deploy to.'
+
+description: Create the PlanetScale and AWS Infrastructure
+
+runs:
+  using: composite
+  steps:
+    - name: Create DB Branch
+      uses: ./.github/actions/create_pscale_db_branch
+      with:
+        db_name: ${{ env.DB_NAME }}
+        org_name: ${{ env.ORG_NAME }}
+        branch_name: ${{ inputs.environment }}
+
+    - id: dburl
+      name: Create DB Branch Password
+      uses: ./.github/actions/create_pscale_db_branch_password
+      with:
+        db_name: ${{ env.DB_NAME }}
+        org_name: ${{ env.ORG_NAME }}
+        branch_name: ${{ inputs.environment }}
+
+    - uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.4
+        terraform_wrapper: false
+
+    - name: Terraform init
+      working-directory: terraform
+      shell: bash
+      run: terraform init
+      env:
+        TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+
+    - name: Create Workspace
+      working-directory: terraform
+      shell: bash
+      if: inputs.environment != 'main'
+      run: terraform workspace select -or-create ${{ inputs.environment }}
+      env:
+        TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+
+    - id: terraform
+      name: Deploy ${{ inputs.environment }}
+      working-directory: terraform
+      shell: bash
+      run: |
+        terraform apply -auto-approve
+        terraform output -json | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"' >> $GITHUB_ENV
+      env:
+        TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+      # Check outputs at /terraform/outputs.tf
