@@ -3,7 +3,7 @@ output "FUNCTION_NAME" {
 }
 
 output "API_BASE_URL" {
-  value = aws_api_gateway_deployment.stage_v1.invoke_url
+  value = aws_api_gateway_deployment.stage_v2.invoke_url
 }
 
 output "WEBSITE_BUCKET" {
