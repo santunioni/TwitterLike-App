@@ -7,7 +7,7 @@ variable "DATABASE_URL" {
 variable "STAGE_NAME" {
   description = "The stage name"
   type        = string
-  default     = "v2"
+  default     = "v1"
 }
 
 variable "PSCALE_DB_NAME" {
