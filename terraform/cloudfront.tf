@@ -55,6 +55,10 @@ resource "aws_cloudfront_distribution" "website" {
   origin {
     domain_name = aws_s3_bucket.website.bucket_regional_domain_name
     origin_id   = aws_s3_bucket.website.id
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_control.website.id
+    }
+    origin_path = ""
   }
 
   default_cache_behavior {
@@ -72,6 +76,13 @@ resource "aws_cloudfront_distribution" "website" {
     default_ttl = 0
     max_ttl     = 60
   }
+}
+
+resource "aws_cloudfront_origin_access_control" "website" {
+  description                       = local.NAME
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 locals {
