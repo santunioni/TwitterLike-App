@@ -80,7 +80,7 @@ jobs:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
       - id: terraform
-        name: Terraforma Apply
+        name: Terraform Apply
         working-directory: terraform
         shell: bash
         run: |
