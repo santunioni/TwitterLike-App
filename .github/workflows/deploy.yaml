@@ -86,9 +86,9 @@ jobs:
         shell: bash
         run: |
           terraform apply -auto-approve
-          TERRAFORM_OUTPUTS=$(terraform output -json | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"')
-          echo $TERRAFORM_OUTPUTS >> $GITHUB_ENV
-          echo $TERRAFORM_OUTPUTS >> $GITHUB_OUTPUT
+
+          terraform output -json | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"' >> $GITHUB_ENV
+          terraform output -json | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"' >> $GITHUB_OUTPUT
         env:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
