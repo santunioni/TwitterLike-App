@@ -21,7 +21,7 @@ resource "aws_cloudfront_distribution" "website" {
   origin {
     domain_name = replace(aws_api_gateway_deployment.stage_v1.invoke_url, "/^https?://([^/]*).*/", "$1")
     origin_id   = "apigw"
-    origin_path = aws_api_gateway_deployment.stage_v1.stage_name
+    origin_path = "/${aws_api_gateway_deployment.stage_v1.stage_name}"
 
     custom_origin_config {
       http_port              = 80
