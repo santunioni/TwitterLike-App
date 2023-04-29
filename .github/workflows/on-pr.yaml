@@ -19,7 +19,6 @@ jobs:
   sandbox:
     uses: ./.github/workflows/deploy.yaml
     name: Sandbox
-    needs: checks
     secrets: inherit
     with:
       environment: pr${{ github.event.pull_request.number }}
