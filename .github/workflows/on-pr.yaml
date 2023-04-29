@@ -28,4 +28,4 @@ jobs:
     needs: sandbox-deploy
     secrets: inherit
     with:
-      API_BASE_URL: jobs.sandbox-deploy.outputs.API_BASE_URL
+      API_BASE_URL: ${{ needs.sandbox-deploy.outputs.API_BASE_URL }}
