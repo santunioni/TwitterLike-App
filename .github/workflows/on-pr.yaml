@@ -22,4 +22,4 @@ jobs:
     needs: checks
     secrets: inherit
     with:
-      environment: sandbox
+      environment: pr${{ github.event.pull_request.number }}
