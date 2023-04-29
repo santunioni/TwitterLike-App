@@ -30,18 +30,3 @@ resource "aws_s3_bucket_policy" "website" {
 
   depends_on = [aws_s3_bucket_public_access_block.website]
 }
-
-resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = aws_s3_bucket.website.id
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "404.html"
-  }
-}
-
-locals {
-  WEBSITE_URL = "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
-}
