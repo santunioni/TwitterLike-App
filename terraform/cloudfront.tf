@@ -79,6 +79,7 @@ resource "aws_cloudfront_distribution" "website" {
 }
 
 resource "aws_cloudfront_origin_access_control" "website" {
+  name                              = local.NAME
   description                       = local.NAME
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
