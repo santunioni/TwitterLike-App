@@ -19,6 +19,7 @@
     "migration:check": "npm run typeorm migration:generate migrations -- --check",
     "test": "jest",
     "lint": "eslint \"src/**/*.ts\"",
+    "lint:cached": "eslint \"src/**/*.ts\" --cache",
     "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
