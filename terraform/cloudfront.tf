@@ -8,7 +8,7 @@ resource "aws_cloudfront_distribution" "website" {
   restrictions {
     geo_restriction {
       restriction_type = "whitelist"
-      locations        = ["BR"]
+      locations        = ["BR", "US"]
     }
   }
 
