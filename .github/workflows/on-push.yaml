@@ -14,10 +14,12 @@ concurrency:
 jobs:
   checks:
     uses: ./.github/workflows/checks.yaml
+    name: Checks
 
   tests:
     uses: ./.github/workflows/unit.yaml
     needs: checks
+    name: Unit
 
   sandbox:
     uses: ./.github/workflows/deploy.yaml
@@ -27,16 +29,26 @@ jobs:
     with:
       environment: sandbox
 
+  acceptance:
+    uses: ./.github/workflows/acceptance.yaml
+    name: Acceptance
+    needs: sandbox
+    secrets: inherit
+    with:
+      API_BASE_URL: ${{ needs.sandbox.outputs.API_BASE_URL }}
+
   clear:
     needs: sandbox
     uses: ./.github/workflows/clear.yaml
+    name: Clear
     secrets: inherit
     with:
       environment: sandbox
 
   cd:
-    needs: [sandbox, tests]
+    needs: [acceptance, tests]
     uses: ./.github/workflows/deploy.yaml
     secrets: inherit
+    name: Production
     with:
       environment: main
