@@ -12,6 +12,12 @@ on:
         description: 'The base URL of the API to test.'
         value: ${{ jobs.deploy.outputs.API_BASE_URL }}
 
+env:
+  DB_NAME: realworld-app
+  ORG_NAME: santunioni
+  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_TOKEN_ID }}
+  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_TOKEN }}
+
 permissions:
   contents: read
   id-token: write
@@ -34,16 +40,57 @@ jobs:
             package-lock.json
             packages/*/package.json
 
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.4
+          terraform_wrapper: false
+
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::814320462898:role/iac
           aws-region: us-east-1
 
-      - uses: ./.github/actions/infrastructure # Will set the Env Vars at outputs /terraform/outputs.tf
-        name: Terraform
-        id: terraform
+      - name: Planetscale DB Branch
+        uses: ./.github/actions/create_pscale_db_branch
         with:
-          environment: ${{ inputs.environment }}
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ inputs.environment }}
+
+      - id: dburl
+        name: Planetscale DB Branch Password
+        uses: ./.github/actions/create_pscale_db_branch_password
+        with:
+          db_name: ${{ env.DB_NAME }}
+          org_name: ${{ env.ORG_NAME }}
+          branch_name: ${{ inputs.environment }}
+
+      - name: Terraform init
+        working-directory: terraform
+        shell: bash
+        run: terraform init
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+
+      - name: Create Workspace
+        working-directory: terraform
+        shell: bash
+        if: inputs.environment != 'main'
+        run: terraform workspace select -or-create ${{ inputs.environment }}
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
+
+      - id: terraform
+        name: Deploy ${{ inputs.environment }}
+        working-directory: terraform
+        shell: bash
+        run: |
+          terraform apply -auto-approve
+          TERRAFORM_OUTPUTS=$(terraform output -json | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"')
+          echo $TERRAFORM_OUTPUTS >> $GITHUB_ENV
+          echo $TERRAFORM_OUTPUTS >> $GITHUB_OUTPUT
+        env:
+          TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
       - name: Dependencies
         shell: bash
