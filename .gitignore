@@ -18,4 +18,3 @@ nohup.out
 .env
 tsconfig.tsbuildinfo
 bin/
-.eslintcache

@@ -5,7 +5,6 @@
     "test": "concurrently \"DRIVER=trpc jest\" \"DRIVER=rest jest\"",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
-    "lint:cached": "eslint --cache --ext .ts src",
     "lint:fix": "eslint --ext .ts src --fix"
   },
   "dependencies": {

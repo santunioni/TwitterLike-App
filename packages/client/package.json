@@ -9,9 +9,8 @@
     "build": "next build",
     "deploy": "aws s3 sync ./out/ s3://$WEBSITE_BUCKET/ --delete",
     "start": "next start -p 3001",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"  lint",
-    "lint:cached": "eslint \"src/**/*.{ts,tsx}\" --cache",
-    "lint:fix": "eslint \"src/**/*.{ts,tsx}\"  lint --fix",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
