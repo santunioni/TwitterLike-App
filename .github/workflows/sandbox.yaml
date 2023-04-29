@@ -1,0 +1,28 @@
+name: Sandbox
+
+run-name: Sandbox
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'The environment name'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yaml
+    needs: checks
+    name: Deploy
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
+
+  acceptance:
+    uses: ./.github/workflows/acceptance.yaml
+    needs: sandbox-deploy
+    name: Acceptance
+    secrets: inherit
+    with:
+      API_BASE_URL: ${{ needs.deploy.outputs.API_BASE_URL }}

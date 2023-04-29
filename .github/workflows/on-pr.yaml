@@ -12,20 +12,14 @@ jobs:
   checks:
     uses: ./.github/workflows/checks.yaml
 
-  local-tests:
-    uses: ./.github/workflows/local-tests.yaml
+  tests:
+    uses: ./.github/workflows/unit.yaml
     needs: checks
 
-  sandbox-deploy:
+  sandbox:
     uses: ./.github/workflows/deploy.yaml
+    name: Sandbox
     needs: checks
     secrets: inherit
     with:
       environment: sandbox
-
-  sandbox-tests:
-    uses: ./.github/workflows/acceptance-tests.yaml
-    needs: sandbox-deploy
-    secrets: inherit
-    with:
-      API_BASE_URL: ${{ needs.sandbox-deploy.outputs.API_BASE_URL }}
