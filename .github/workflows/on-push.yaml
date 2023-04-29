@@ -41,7 +41,7 @@ jobs:
       environment: sandbox
 
   cd:
-    needs: sandbox-tests
+    needs: [sandbox-tests, local-tests]
     uses: ./.github/workflows/deploy.yaml
     secrets: inherit
     with:
