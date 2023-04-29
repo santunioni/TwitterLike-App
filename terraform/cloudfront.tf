@@ -117,10 +117,6 @@ resource "aws_cloudfront_origin_access_identity" "website" {
 
 
 locals {
-  WEBSITE_URL = [
-    "https://${aws_cloudfront_distribution.website.domain_name}",
-    aws_s3_bucket_website_configuration.website.website_domain,
-    aws_s3_bucket_website_configuration.website.website_endpoint,
-    aws_s3_bucket.website.bucket_regional_domain_name
-  ]
+  WEBSITE_URL = "https://${aws_cloudfront_distribution.website.domain_name}"
+
 }
