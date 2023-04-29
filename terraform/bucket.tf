@@ -8,9 +8,9 @@ resource "aws_s3_bucket_public_access_block" "website" {
   bucket = aws_s3_bucket.website.id
 
   block_public_acls       = true
-  block_public_policy     = true
+  block_public_policy     = false
   ignore_public_acls      = true
-  restrict_public_buckets = true
+  restrict_public_buckets = false
 }
 
 resource "aws_s3_bucket_policy" "website" {
@@ -39,6 +39,13 @@ resource "aws_s3_bucket_policy" "website" {
         "Principal" : {
           "AWS" : "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.website.id}"
         },
+        "Action" : "s3:GetObject",
+        "Resource" : "${aws_s3_bucket.website.arn}/*",
+      },
+      {
+        "Sid" : "AllowAllReadOnly",
+        "Effect" : "Allow",
+        "Principal" : "*",
         "Action" : "s3:GetObject",
         "Resource" : "${aws_s3_bucket.website.arn}/*",
       }

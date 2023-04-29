@@ -34,7 +34,27 @@ resource "aws_cloudfront_distribution" "website" {
   ordered_cache_behavior {
     path_pattern     = "/api/*"
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "apigw"
+
+    default_ttl = 0
+    min_ttl     = 0
+    max_ttl     = 0
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "all"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "/trpc/*"
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "apigw"
 
     default_ttl = 0
@@ -53,12 +73,18 @@ resource "aws_cloudfront_distribution" "website" {
 
   # Set up the origin for the S3 website bucket
   origin {
-    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
+    domain_name = aws_s3_bucket_website_configuration.website.website_endpoint
     origin_id   = aws_s3_bucket.website.id
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_control.website.id
-    }
     origin_path = ""
+
+    custom_origin_config {
+      http_port                = 80
+      https_port               = 443
+      origin_protocol_policy   = "http-only"
+      origin_ssl_protocols     = ["TLSv1.2"]
+      origin_read_timeout      = 5
+      origin_keepalive_timeout = 5
+    }
   }
 
   default_cache_behavior {
@@ -66,6 +92,7 @@ resource "aws_cloudfront_distribution" "website" {
     target_origin_id       = aws_s3_bucket.website.id
     viewer_protocol_policy = "redirect-to-https"
     cached_methods         = ["GET", "HEAD"]
+
     forwarded_values {
       query_string = false
       cookies {
@@ -76,16 +103,24 @@ resource "aws_cloudfront_distribution" "website" {
     default_ttl = 0
     max_ttl     = 60
   }
+
+  wait_for_deployment = false
+
+  depends_on = [
+    aws_cloudfront_origin_access_identity.website
+  ]
 }
 
-resource "aws_cloudfront_origin_access_control" "website" {
-  name                              = local.NAME
-  description                       = local.NAME
-  origin_access_control_origin_type = "s3"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
+resource "aws_cloudfront_origin_access_identity" "website" {
+  comment = local.NAME
 }
+
 
 locals {
-  WEBSITE_URL = "https://${aws_cloudfront_distribution.website.domain_name}"
+  WEBSITE_URL = [
+    "https://${aws_cloudfront_distribution.website.domain_name}",
+    aws_s3_bucket_website_configuration.website.website_domain,
+    aws_s3_bucket_website_configuration.website.website_endpoint,
+    aws_s3_bucket.website.bucket_regional_domain_name
+  ]
 }
