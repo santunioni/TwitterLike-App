@@ -53,7 +53,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   # Set up the origin for the S3 website bucket
   origin {
-    domain_name = aws_s3_bucket_website_configuration.website.website_endpoint
+    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
     origin_id   = aws_s3_bucket.website.id
   }
 
