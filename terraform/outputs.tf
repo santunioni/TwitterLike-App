@@ -10,10 +10,6 @@ output "WEBSITE_ENDPOINT" {
   value = local.WEBSITE_URL
 }
 
-output "DATABASE_URL" {
-  value = var.DATABASE_URL
-}
-
 output "WEBSITE_BUCKET" {
   value = aws_s3_bucket.website.bucket
 }

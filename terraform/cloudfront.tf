@@ -118,5 +118,4 @@ resource "aws_cloudfront_origin_access_identity" "website" {
 
 locals {
   WEBSITE_URL = "https://${aws_cloudfront_distribution.website.domain_name}"
-
 }

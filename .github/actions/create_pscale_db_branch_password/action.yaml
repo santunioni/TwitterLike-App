@@ -49,6 +49,7 @@ runs:
 
         if [ -n "$DATABASE_URL" ] && [ -n "$FOUND" ]; then
           echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
+          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV‘
           exit 0
         fi
 
@@ -61,3 +62,4 @@ runs:
         aws ssm put-parameter --name "$URL_PATH" --value "$DATABASE_URL" --type SecureString --overwrite
 
         echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_OUTPUT
+        echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV
