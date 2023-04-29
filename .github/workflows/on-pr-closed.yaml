@@ -10,5 +10,5 @@ jobs:
   clear:
     uses: ./.github/workflows/clear.yaml
     with:
-      environment: ephemeral-pr-${{ github.event.pull_request.number }}
+      environment: pr${{ github.event.pull_request.number }}
     secrets: inherit
