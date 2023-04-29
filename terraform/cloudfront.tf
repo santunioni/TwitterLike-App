@@ -71,30 +71,6 @@ resource "aws_cloudfront_distribution" "website" {
   }
 }
 
-resource "aws_cloudfront_cache_policy" "api_cache" {
-  name    = "api_cache"
-  comment = "API Cache Policy"
-
-  default_ttl = 7
-  max_ttl     = 10
-  min_ttl     = 5
-
-  parameters_in_cache_key_and_forwarded_to_origin {
-    cookies_config {
-      cookie_behavior = "none"
-    }
-    enable_accept_encoding_brotli = false
-    enable_accept_encoding_gzip   = false
-    headers_config {
-      header_behavior = "none"
-    }
-    query_strings_config {
-      query_string_behavior = "none"
-    }
-  }
-}
-
-
 locals {
   WEBSITE_URL = "https://${aws_cloudfront_distribution.website.domain_name}"
 }
