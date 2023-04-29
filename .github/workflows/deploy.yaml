@@ -36,9 +36,8 @@ jobs:
         with:
           cache: 'npm'
           cache-dependency-path: |
-            package.json
             package-lock.json
-            packages/*/package.json
+          node-version: 18
 
       - uses: hashicorp/setup-terraform@v2
         with:

@@ -30,9 +30,8 @@ jobs:
         with:
           cache: 'npm'
           cache-dependency-path: |
-            package.json
             package-lock.json
-            packages/*/package.json
+          node-version: 18
 
       - run: npm install
         shell: bash
