@@ -12,6 +12,10 @@ on:
         description: 'The base URL of the API to test.'
         value: ${{ jobs.deploy.outputs.API_BASE_URL }}
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
