@@ -44,11 +44,8 @@ resource "aws_lambda_function" "realworld_api_function" {
   function_name = local.NAME
   role          = aws_iam_role.realworld_api_function_role.arn
   filename      = data.archive_file.dummy.output_path
-  # Changing source_code_hash will deploy dummy code to production!
-  # This is a trick to decouple provisioning lambda function (terraform) from deploying code.
-  source_code_hash = "DONT CHANGE THIS!"
-  tags             = local.COMMON_TAGS
-  provider         = aws
+  tags          = local.COMMON_TAGS
+  provider      = aws
   environment {
     variables = {
       DATABASE_URL         = var.DATABASE_URL

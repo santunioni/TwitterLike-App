@@ -64,7 +64,7 @@ jobs:
           org_name: ${{ env.ORG_NAME }}
           branch_name: ${{ inputs.environment }}
 
-      - name: Terraform init
+      - name: Terraform Init
         working-directory: terraform
         shell: bash
         run: terraform init
@@ -80,7 +80,7 @@ jobs:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
       - id: terraform
-        name: Deploy ${{ inputs.environment }}
+        name: Terraform Apply
         working-directory: terraform
         shell: bash
         run: |
@@ -104,9 +104,9 @@ jobs:
           path: |
             ~/.npm
             ${{ github.workspace }}/packages/client/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Build
         shell: bash

@@ -11,15 +11,24 @@ concurrency:
 jobs:
   checks:
     uses: ./.github/workflows/checks.yaml
+    name: Checks
 
   tests:
     uses: ./.github/workflows/unit.yaml
     needs: checks
+    name: Unit
 
   sandbox:
     uses: ./.github/workflows/deploy.yaml
     name: Sandbox
-    needs: checks
     secrets: inherit
     with:
-      environment: sandbox
+      environment: pr${{ github.event.pull_request.number }}
+
+  acceptance:
+    uses: ./.github/workflows/acceptance.yaml
+    name: Acceptance
+    needs: sandbox
+    secrets: inherit
+    with:
+      API_BASE_URL: ${{ needs.sandbox.outputs.API_BASE_URL }}
