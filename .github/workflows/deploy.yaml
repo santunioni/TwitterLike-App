@@ -64,7 +64,7 @@ jobs:
           org_name: ${{ env.ORG_NAME }}
           branch_name: ${{ inputs.environment }}
 
-      - name: Terraform init
+      - name: Terraform Init
         working-directory: terraform
         shell: bash
         run: terraform init
@@ -80,7 +80,7 @@ jobs:
           TF_VAR_DATABASE_URL: ${{ steps.dburl.outputs.DATABASE_URL }}
 
       - id: terraform
-        name: Deploy ${{ inputs.environment }}
+        name: Terraforma Apply
         working-directory: terraform
         shell: bash
         run: |
