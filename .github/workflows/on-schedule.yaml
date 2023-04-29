@@ -13,7 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/credentials
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::814320462898:role/iac
+          aws-region: us-east-1
+
       - run: |
           KEYS=$(aws s3api list-objects --bucket santunioni-iac-state --prefix env:/ --output json --query 'Contents[*].Key' | jq '[.[] | select(. | test("realworld-app\/\\w+.tfstate$"))]')
           TERRAFORM_WORKSPACES=$(echo $KEYS | jq '[.[] | sub("^env:\/";"") | sub("\/realworld-app\/\\w+.tfstate$";"")]')

@@ -29,7 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: ./.github/actions/credentials
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::814320462898:role/iac
+          aws-region: us-east-1
 
       - uses: hashicorp/setup-terraform@v2
         with:

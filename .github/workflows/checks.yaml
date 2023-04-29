@@ -1,0 +1,36 @@
+name: Checks
+
+run-name: Checks
+
+on:
+  workflow_call:
+
+jobs:
+  checks:
+    name: Checks
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
+
+      - run: npm install
+        shell: bash
+        name: Dependencies
+
+      - name: Prettier
+        run: npx prettier --check .
+
+      - name: ESLint
+        run: npm run lint --workspaces --if-present
+
+      - name: Typescript
+        run: npm run typecheck --workspaces --if-present

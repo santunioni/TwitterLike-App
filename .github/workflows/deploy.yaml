@@ -3,52 +3,72 @@ name: Deploy
 on:
   workflow_call:
     inputs:
-      TF_OUTPUTS:
-        description: 'The outputs from terraform as JSON.'
-        required: true
-        type: string
       environment:
         description: 'The name of the environment to deploy to.'
         required: true
         type: string
+    outputs:
+      API_BASE_URL:
+        description: 'The base URL of the API to test.'
+        value: ${{ jobs.deploy.outputs.API_BASE_URL }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
+
+    outputs:
+      API_BASE_URL: ${{ steps.terraform.outputs.API_BASE_URL }}
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set Env Vars
-        run: echo ${{ inputs.TF_OUTPUTS }} | jq -r 'keys[] as $k | "\($k)=\(.[$k] | .value)"' >> $GITHUB_ENV
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
 
-      - uses: ./.github/actions/credentials
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::814320462898:role/iac
+          aws-region: us-east-1
 
-      - run: npm install
+      - uses: ./.github/actions/infrastructure # Will set the Env Vars at outputs /terraform/outputs.tf
+        name: Terraform
+        id: terraform
+        with:
+          environment: ${{ inputs.environment }}
+
+      - name: Dependencies
         shell: bash
-        name: Dependencies
+        run: npm install
 
       - run: npm run migration:run --workspace packages/server
         shell: bash
         name: Migrations
 
-      - run: npm run --workspace packages/server build:lambda
-        name: Build Lambda
-
-      - name: Wait ${{ inputs.environment }}
-        run: |
-          ./scripts/wait_for_status.sh "$API_URL/api/checks/readiness" 200
-          ./scripts/wait_for_status.sh "$API_URL/api/articles" 200
-
-      - run: npm run test --workspace packages/acceptance
-        shell: bash
-        name: Acceptance Tests
-
-      - name: Uploading Build
-        uses: actions/upload-artifact@v3
+      - uses: actions/cache@v3
         with:
-          name: build
           path: |
-            terraform/lambda.zip
+            ~/.npm
+            ${{ github.workspace }}/packages/client/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
+      - name: Build
+        shell: bash
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ env.API_BASE_URL }}
+
+      - name: Deploy
+        shell: bash
+        run: npm run deploy
+
+      - name: Wait environment
+        run: |
+          ./scripts/wait_for_status.sh "$API_BASE_URL/api/checks/readiness" 200
+          ./scripts/wait_for_status.sh "$API_BASE_URL/api/articles" 200

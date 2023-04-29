@@ -1,0 +1,65 @@
+name: Local Tests
+
+run-name: Local Tests
+
+on:
+  workflow_call:
+
+jobs:
+  server:
+    name: Server Tests
+    needs: checks
+    services:
+      mysql:
+        image: mysql:5.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: app
+          MYSQL_USER: app
+          MYSQL_PASSWORD: app
+        ports:
+          - '3306:3306'
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql://app:app@localhost:3306/app
+      API_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package.json
+            package-lock.json
+            packages/*/package.json
+
+      - run: npm install
+        shell: bash
+        name: Dependencies
+
+      - run: |
+          npm run migration:run --workspace packages/server
+          npm run migration:check --workspace packages/server
+        shell: bash
+        name: Migrations
+
+      - run: npm run test --workspace packages/server
+        shell: bash
+        name: Server Unit Tests
+
+      - name: Building Application
+        shell: bash
+        run: |
+          npm run --workspace packages/server nest:build
+
+      - name: Starting localhost server
+        shell: bash
+        run: |
+          nohup sh -c 'npm run nest:start --workspace packages/server' &
+          ./scripts/wait_for_status.sh http://localhost:3000/api/checks/readiness 200
+
+      - run: npm run test --workspace packages/acceptance
+        shell: bash
+        name: Acceptance Tests
