@@ -5,11 +5,6 @@ resource "aws_cloudfront_distribution" "website" {
     origin_id   = aws_s3_bucket.website.id
   }
 
-  origin {
-    domain_name = aws_api_gateway_rest_api.api.execution_arn
-    origin_id   = ""
-  }
-
   enabled             = true
   is_ipv6_enabled     = true
   comment             = local.NAME
