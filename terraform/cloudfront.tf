@@ -43,6 +43,7 @@ resource "aws_cloudfront_distribution" "website" {
 
     forwarded_values {
       query_string = true
+      headers      = ["Authorization"]
       cookies {
         forward = "all"
       }
@@ -63,6 +64,7 @@ resource "aws_cloudfront_distribution" "website" {
 
     forwarded_values {
       query_string = true
+      headers      = ["Authorization"]
       cookies {
         forward = "all"
       }
