@@ -38,7 +38,7 @@ jobs:
       API_BASE_URL: ${{ needs.sandbox.outputs.API_BASE_URL }}
 
   clear:
-    needs: sandbox
+    needs: acceptance
     uses: ./.github/workflows/clear.yaml
     name: Clear
     secrets: inherit
