@@ -12,7 +12,7 @@ import { createPreConfiguredOpenAPIDocumentBuilder } from './nest/openapi'
 import { createContext } from './trpc/app'
 import { createMergedTRPCApp } from './trpc/merged'
 
-export async function createNestApplication(baseApiUrl: string) {
+async function createNestApplication(baseApiUrl: string) {
   const nest = await NestFactory.create(AppModule)
   SwaggerModule.setup(
     'docs',

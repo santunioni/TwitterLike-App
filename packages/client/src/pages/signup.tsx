@@ -52,7 +52,7 @@ export default function Signup() {
       <div>
         <form onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email">Username:</label>
+            <label htmlFor="email">Email:</label>
             <input type="text" id="email" value={email} onChange={event => setEmail(event.target.value)} />
             <>{isInvalidEmail && 'Invalid Email'}</>
           </div>

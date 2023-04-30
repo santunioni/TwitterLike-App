@@ -40,9 +40,22 @@ function getGlobalToken() {
   return token
 }
 
+const mapTokenToUser = new Map<string, any>()
+
 export function getCurrentUser() {
   const token = getGlobalToken()
-  return token ? decodeToken(token) : null
+  if (!token) {
+    return null
+  }
+
+  const cachedUser = mapTokenToUser.get(token)
+  if (cachedUser) {
+    return cachedUser
+  }
+
+  const user = decodeToken(token)
+  mapTokenToUser.set(token, user)
+  return user
 }
 
 export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>
