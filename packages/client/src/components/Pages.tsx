@@ -12,7 +12,7 @@ export function Pages(props: { pagination: Pagination; totalInPage: number }) {
 
   return (
     <>
-      {previousPage.skip > 0 && (
+      {pagination.skip > 0 && (
         <Link href={queryString.getUpdatedLink({ query: previousPage.toParams() })}>
           Previous ({previousPage.skip + 1}...{previousPage.skip + previousPage.take}){' '}
         </Link>
